@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.TeleOp;
-
+/*Andrew Gao 11/21/18
+  First TeleOp program just made, phasing out onbot java
+  can use either twoWheelDrive or JoystickDrive*/
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
