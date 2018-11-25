@@ -54,7 +54,7 @@ public class TeleOpV1 extends OpMode{
             right /= max;
 
         }
-
+//hello kjlkhlkbslb,k,,k
         leftWheel.setPower(left*(1-trigger));
         rightWheel.setPower(right*(1-trigger));
 
