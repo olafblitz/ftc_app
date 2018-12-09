@@ -53,9 +53,8 @@ public class BlueCraterShortAuto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         DownLinearActuator();
-        sleep(1000);
-        encoderDrive(TURN_SPEED,   8, -8, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
-        encoderDrive(DRIVE_SPEED, -24, -24, 4.0);  // S3: Reverse 24 Inches with 4 Sec timeout
+        sleep(3000);
+        encoderDrive(DRIVE_SPEED, -6, -6, 4.0);  // S3: Reverse 6 Inches with 4 Sec timeout
         StopDriving();
     }
 
@@ -86,8 +85,9 @@ public class BlueCraterShortAuto extends LinearOpMode {
     }
 
     public void DownLinearActuator(){
-        linearActuator.setPower(-.6);
+        linearActuator.setPower(-.7);
     }
+
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {

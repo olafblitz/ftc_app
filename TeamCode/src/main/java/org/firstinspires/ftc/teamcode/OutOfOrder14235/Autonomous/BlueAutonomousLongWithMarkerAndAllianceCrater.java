@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
 /*
@@ -22,34 +23,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Gyroscope;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
 
-public class AutonomousWithLinearActuator extends LinearOpMode {
+public class BlueAutonomousLongWithMarkerAndAllianceCrater extends LinearOpMode {
     private Gyroscope imu;
     private DcMotor left_drive;
     private DcMotor right_drive;
-    private DcMotor wormDrive;
-
+    private DcMotor linearActuator;
+    private DcMotor sideArm;
+    private Servo markerDropper;
     @Override
     public void runOpMode() throws InterruptedException{
         imu = hardwareMap.get(Gyroscope.class, "imu");
         left_drive = hardwareMap.get(DcMotor.class, "left_drive");
         right_drive = hardwareMap.get(DcMotor.class, "right_drive");
-        wormDrive =  hardwareMap.get(DcMotor.class, "wormGear");
-
+        linearActuator =  hardwareMap.get(DcMotor.class, "wormGear");
+        sideArm = hardwareMap.get(DcMotor.class, "pulleyMotor");
+        markerDropper = hardwareMap.get(Servo.class,"markerDropper" );
         left_drive.setDirection(DcMotor.Direction.REVERSE);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        wormDrive.setPower(-.7);
-        sleep(4000);
-        DriveBackward(.7);
-        sleep(500);
+        markerDropper.setPosition(.25);
+
+        linearActuator.setPower(-.22);
+        sleep(14900);
+        linearActuator.setPower(0);
+        sleep(1300);
+        DriveBackward(.8);
+        sleep(2300);
+        DriveBackward(0);
+        sleep(100);
+        markerDropper.setPosition(1.7);
+        sleep(300);
+        markerDropper.setPosition(.35);
+        sleep(300);
+        DriveForward(.5);
+        sleep(600);
+        TurnRight(-.5,.5);
+        sleep(1350);
+        DriveForward(.8);
+        sleep(3600);
 
 
     }
@@ -65,6 +88,7 @@ public class AutonomousWithLinearActuator extends LinearOpMode {
         right_drive.setPower(rPower);
 
     }
+
     public void DriveForward(double power){
         left_drive.setPower(power);
         right_drive.setPower(power);
