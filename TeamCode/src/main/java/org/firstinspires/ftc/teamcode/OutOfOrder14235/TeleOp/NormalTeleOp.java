@@ -18,14 +18,15 @@ public class NormalTeleOp extends LinearOpMode {
     private Gyroscope imu;
     private DcMotor leftWheel;
     private DcMotor rightWheel;
-    private DcMotor sideArm;
+    private DcMotor centerWheel;
     private DcMotor linearActuator;
     private Servo markerDropper;
-
+    private DcMotor linExt;
 
 
     @Override
     public void runOpMode() {
+
         double left;
         double right;
         double drive;
@@ -35,9 +36,10 @@ public class NormalTeleOp extends LinearOpMode {
         imu = hardwareMap.get(Gyroscope.class, "imu");
         leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
         rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
-        sideArm = hardwareMap.get(DcMotor.class, "pulleyMotor");
+        centerWheel = hardwareMap.get(DcMotor.class, "pulleyMotor");
         markerDropper = hardwareMap.get(Servo.class, "markerDropper");
         linearActuator = hardwareMap.get(DcMotor.class, "wormGear");
+        linExt = hardwareMap.get(DcMotor.class, "linExt");
 
         leftWheel.setDirection(DcMotor.Direction.REVERSE);
 
@@ -49,14 +51,26 @@ public class NormalTeleOp extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             // trigger = gamepad1.right_trigger;
+            //drive = -gamepad1.left_stick_y;
+            //  turn  =  gamepad1.right_stick_x;
+
+            // Combine drive and turn for blended motion.
+            //left  = drive + turn;
+            //right = drive - turn;
+
+            // Normalize the values so neither exceed +/- 1.0
+            //  max = Math.max(Math.abs(left), Math.abs(right));
+            //if (max > 1.0)
+            //{
+            //    left /= max;
+            //    right /= max;
+            // }
+
             drive = -gamepad1.left_stick_y;
             turn  =  gamepad1.right_stick_x;
 
-            // Combine drive and turn for blended motion.
             left  = drive + turn;
             right = drive - turn;
-
-            // Normalize the values so neither exceed +/- 1.0
             max = Math.max(Math.abs(left), Math.abs(right));
             if (max > 1.0)
             {
@@ -67,39 +81,47 @@ public class NormalTeleOp extends LinearOpMode {
             leftWheel.setPower(left);
             rightWheel.setPower(right);
 
-            if(gamepad1.a){
+            if(gamepad1.y){
                 linearActuator.setPower(-1);
             }
-            else if(gamepad1.b){
+            else if(gamepad1.a){
                 linearActuator.setPower(1);
             }
             else{
                 linearActuator.setPower(0);
             }
             if(gamepad1.x){
-                sideArm.setPower(.7);
+                centerWheel.setPower(.7);
             }
-            else if(gamepad1.y){
-                sideArm.setPower(-.7);
+            else if(gamepad1.b){
+                centerWheel.setPower(-.7);
             }
             else{
-                sideArm.setPower(0);
+                centerWheel.setPower(0);
             }
             if (gamepad1.dpad_left){
-                markerDropper.setPosition(.25);
+                markerDropper.setPosition(.3);
             }
             else if (gamepad1.dpad_right){
-                markerDropper.setPosition(1);
+                markerDropper.setPosition(0.75);
 
             }
-
-            telemetry.addData("Status", "Running");
-
-            telemetry.update();
-
+            if(gamepad1.right_bumper){
+                linExt.setPower(.95);
+            }
+            else if(gamepad1.left_bumper){
+                linExt.setPower(-.95);
+            }
+            else{
+                linExt.setPower(0);
+            }
         }
+        telemetry.addData("Status", "Running");
 
+        telemetry.update();
 
     }
 
+
 }
+
