@@ -1,6 +1,6 @@
 
 
-package org.firstinspires.ftc.teamcode.OutOfOrder14235.Testing;
+package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
@@ -143,7 +143,17 @@ boolean initLoop = false;
 
         telemetry.addData("IsAligned" , detector.getAligned()); // Is the bot aligned with the gold mineral?
         telemetry.addData("X Pos" , detector.getXPosition()); // Gold X position.
-        
+        while (true) {
+            if (detector.getAligned()) {
+                ShiftRight(.3);
+                sleep(400);
+                ShiftLeft(.4);
+                sleep(400);
+                break;
+            } else {
+                DriveForward(.2);
+            }
+        }
     }
     @Override
     public void start(){
@@ -300,12 +310,12 @@ boolean initLoop = false;
         if (degrees < 0)
         {
             // On right turn we have to get off zero first.
-            while (initLoop && getAngle() == 0) {msStuckDetectInitLoop =  5000 + (int)System.currentTimeMillis();}
+            while (initLoop && getAngle() == 0) {msStuckDetectInitLoop =  (int)System.currentTimeMillis();}
 
-            while (initLoop && getAngle() > degrees) {msStuckDetectInitLoop =  5000 + (int)System.currentTimeMillis();}
+            while (initLoop && getAngle() > degrees) {msStuckDetectInitLoop = (int)System.currentTimeMillis();}
         }
         else    // left turn.
-            while (initLoop && getAngle() < degrees) {msStuckDetectInitLoop =  5000 + (int)System.currentTimeMillis();}
+            while (initLoop && getAngle() < degrees) {msStuckDetectInitLoop =   (int)System.currentTimeMillis();}
 
 
         // turn the motors off.

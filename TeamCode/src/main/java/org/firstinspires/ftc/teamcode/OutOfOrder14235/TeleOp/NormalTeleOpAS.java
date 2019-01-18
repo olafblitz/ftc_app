@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 
-public class NormalTeleOp extends LinearOpMode {
+public class NormalTeleOpAS extends LinearOpMode {
 
     private Gyroscope imu;
     private DcMotor leftWheel;
@@ -82,10 +82,10 @@ public class NormalTeleOp extends LinearOpMode {
             rightWheel.setPower(right);
 
             if(gamepad1.y){
-                linearActuator.setPower(-1);
+                linearActuator.setPower(1);
             }
             else if(gamepad1.a){
-                linearActuator.setPower(1);
+                linearActuator.setPower(-1);
             }
             else{
                 linearActuator.setPower(0);

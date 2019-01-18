@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
+package org.firstinspires.ftc.teamcode.OutOfOrder14235.Testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -51,6 +51,7 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
+@Disabled
 @TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
 //@Disabled
 public class ConceptTensorFlowObjectDetectionPhoneCamera extends LinearOpMode {
