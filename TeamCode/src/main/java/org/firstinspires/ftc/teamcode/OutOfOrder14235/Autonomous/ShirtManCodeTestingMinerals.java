@@ -24,12 +24,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.abs;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
 
 @Autonomous
 
 public class ShirtManCodeTestingMinerals extends OpMode {
+    double desiredAngle;
+    double currentRotation = getAngle();
+    double  error;
+
+
     private ElapsedTime runtime = new ElapsedTime();
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
 
@@ -140,26 +146,30 @@ boolean initLoop = false;
     @Override
     public void loop(){
         initLoop = false;
-
         telemetry.addData("IsAligned" , detector.getAligned()); // Is the bot aligned with the gold mineral?
         telemetry.addData("X Pos" , detector.getXPosition()); // Gold X position.
-        while (true) {
+        desiredAngle = 9000;
+        currentRotation = getAngle();
+        error = desiredAngle - currentRotation;
+
+        if(Math.abs(error) > 5) {rotate((int)(desiredAngle - currentRotation),.8 ); }
+/*
             if (detector.getAligned()) {
                 ShiftRight(.3);
                 sleep(400);
                 ShiftLeft(.4);
                 sleep(400);
-                break;
             } else {
                 DriveForward(.2);
             }
-        }
+            */
+
     }
     @Override
     public void start(){
 
         runtime.reset();
-        rotate(90,.4);
+        //rotate(90,.4);
 
     }
     @Override
@@ -328,4 +338,8 @@ boolean initLoop = false;
         // reset angle tracking on new heading.
         resetAngle();
     }
+    public double getGlobalAngle() {
+        return globalAngle;
+    }
+
 }
