@@ -56,7 +56,6 @@ public class ShirtManCodeTestingMinerals extends OpMode {
     Orientation             lastAngles = new Orientation();
     double globalAngle, power = .30, correction;
     boolean                 aButton, bButton, touched;
-boolean initLoop = false;
     //GoldAlignDetector
     //private GoldAlignDetector detector;
 
@@ -70,7 +69,7 @@ boolean initLoop = false;
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         // Vuforia licence key
-        parameters.vuforiaLicenseKey = "AXykNg//////AAABmdVQDVwq9kAEsspJU9r8u8VmSeZBFzHTHr6fsWSjYKVlHaAw6uE0fxEJ0zCNaIbGmpOSWf0NY/pFNh4N5uYYtL99ymMWhR2tfuIBXgo7T4m8ht7lStZtjHjmcmO0nQBzzGCm74gw+CDYvRbfDYtr95fNuoMIcyZUiv2TpUcsbebE+fT6HEfyGXyF1j4d6CEzWc1Qhdy+nCCC3kO/5oDt8usf3ryOzBgFW/l4l+YEqk1LVw1vrx4+DhiqQ87ohJDybGab6FvqxC2Hlryx0p7BdmwCtQqfaRD8s8icv7XUR09Xlij02Z5iRe/7+aJc44fxmu3xTB17y3r8Er0YmqVvU3EChH5p0+SiHl+z36p78c1J\n";
+        parameters.vuforiaLicenseKey = "AXykNg//////AAABmdVQDVwq9kAEsspJU9r8u8VmSeZBFzHTHr6fsWSjYKVlHaAw6uE0fxEJ0zCNaIbGmpOSWf0NY/pFNh4N5uYYtL99ymMWhR2tfuIBXgo7T4m8ht7lStZtjHjmcmO0nQBzzGCm74gw+CDYvRbfDYtr95fNuoMIcyZUiv2TpUcsbebE+fT6HEfyGXyF1j4d6CEzWc1Qhdy+nCCC3kO/5oDt8usf3ryOzBgFW/l4l+YEqk1LVw1vrx4+DhiqQ87ohJDybGab6FvqxC2Hlryx0p7BdmwCtQqfaRD8s8icv7XUR09Xlij02Z5iRe/7+aJc44fxmu3xTB17y3r8Er0YmqVvU3EChH5p0+SiHl+z36p78c1J";
         parameters.fillCameraMonitorViewParent = true;
 
         // Set camera name for Vuforia config
@@ -89,7 +88,6 @@ boolean initLoop = false;
         detector.useDefaults();
         detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Can also be PERFECT_AREA
         //detector.perfectAreaScorer.perfectArea = 10000; // if using PERFECT_AREA scoring
-        detector.downscale = 0.8;
         // Optional tuning
         detector.alignSize = 100; // How wide (in pixels) is the range in which the gold object will be aligned. (Represented by green bars in the preview)
         detector.alignPosOffset = 0; // How far from center frame to offset this alignment zone.
@@ -107,13 +105,16 @@ boolean initLoop = false;
         vuforia.showDebug();
         vuforia.start();
         // Set up detector
+
+        telemetry.addData("Mode", "IMU calibrating...");
+        telemetry.update();
+
         BNO055IMU.Parameters parametersIMU = new BNO055IMU.Parameters();
 
         parametersIMU.mode                = BNO055IMU.SensorMode.IMU;
         parametersIMU.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parametersIMU.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parametersIMU.loggingEnabled      = false;
-
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
@@ -129,23 +130,15 @@ boolean initLoop = false;
         rightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         imu.initialize(parametersIMU);
 
-        telemetry.addData("Mode", "IMU calibrating...");
-        telemetry.update();
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)
 
     }
 
-    @Override
-    public void init_loop() {
-        initLoop = true;
-    }
 
     @Override
     public void loop(){
-        initLoop = false;
         telemetry.addData("IsAligned" , detector.getAligned()); // Is the bot aligned with the gold mineral?
         telemetry.addData("X Pos" , detector.getXPosition()); // Gold X position.
         desiredAngle = 9000;
@@ -320,12 +313,12 @@ boolean initLoop = false;
         if (degrees < 0)
         {
             // On right turn we have to get off zero first.
-            while (initLoop && getAngle() == 0) {msStuckDetectInitLoop =  (int)System.currentTimeMillis();}
+            while ( getAngle() == 0) {msStuckDetectInitLoop =  (int)System.currentTimeMillis();}
 
-            while (initLoop && getAngle() > degrees) {msStuckDetectInitLoop = (int)System.currentTimeMillis();}
+            while ( getAngle() > degrees) {msStuckDetectInitLoop = (int)System.currentTimeMillis();}
         }
         else    // left turn.
-            while (initLoop && getAngle() < degrees) {msStuckDetectInitLoop =   (int)System.currentTimeMillis();}
+            while (getAngle() < degrees) {msStuckDetectInitLoop =   (int)System.currentTimeMillis();}
 
 
         // turn the motors off.

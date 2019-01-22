@@ -1,65 +1,39 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
-
-//import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-@Autonomous
-//@Disabled
-public class IMUTesting90degreeTurnTensorFlow extends LinearOpMode {
-    BNO055IMU               imu;
-    private DcMotor leftWheel;
-    private DcMotor rightWheel;
-    private DcMotor centerWheel;
-    private DcMotor linearActuator;
-    private Servo markerDropper;
-    private DcMotor linExt;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import java.util.List;
+
+public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTensorFlowNothingElseFromCraterPosition extends LinearOpMode{
+    HardwareRobot robot;
+
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
     private static final String VUFORIA_KEY = "AXykNg//////AAABmdVQDVwq9kAEsspJU9r8u8VmSeZBFzHTHr6fsWSjYKVlHaAw6uE0fxEJ0zCNaIbGmpOSWf0NY/pFNh4N5uYYtL99ymMWhR2tfuIBXgo7T4m8ht7lStZtjHjmcmO0nQBzzGCm74gw+CDYvRbfDYtr95fNuoMIcyZUiv2TpUcsbebE+fT6HEfyGXyF1j4d6CEzWc1Qhdy+nCCC3kO/5oDt8usf3ryOzBgFW/l4l+YEqk1LVw1vrx4+DhiqQ87ohJDybGab6FvqxC2Hlryx0p7BdmwCtQqfaRD8s8icv7XUR09Xlij02Z5iRe/7+aJc44fxmu3xTB17y3r8Er0YmqVvU3EChH5p0+SiHl+z36p78c1J";
-
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
     private VuforiaLocalizer vuforia;
-
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the Tensor Flow Object
-     * Detection engine.
-     */
     private TFObjectDetector tfod;
+    Orientation             lastAngles = new Orientation();
 
-    @Override
+    double globalAngle, power = .30, correction;
     public void runOpMode() {
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
-        rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
-        centerWheel = hardwareMap.get(DcMotor.class, "pulleyMotor");
-        markerDropper = hardwareMap.get(Servo.class, "markerDropper");
-        linearActuator = hardwareMap.get(DcMotor.class, "wormGear");
-        linExt = hardwareMap.get(DcMotor.class, "linExt");
-        leftWheel.setDirection(DcMotor.Direction.REVERSE);
-
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
+        robot = new HardwareRobot();
+        robot.init(hardwareMap);
+        initIMU();
         initVuforia();
-
+        robot.markerDropper.setPosition(.3);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
             initTfod();
         } else {
@@ -70,6 +44,13 @@ public class IMUTesting90degreeTurnTensorFlow extends LinearOpMode {
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
         waitForStart();
+
+//delatch, get off
+        
+        rotate(90,.5);
+
+
+
 
         if (opModeIsActive()) {
             /** Activate Tensor Flow Object Detection. */
@@ -148,7 +129,49 @@ public class IMUTesting90degreeTurnTensorFlow extends LinearOpMode {
         if (tfod != null) {
             tfod.shutdown();
         }
+        //gyro turn
+
     }
+
+    public void waiting(long millis){
+        long t = System.currentTimeMillis();
+        while(opModeIsActive()&&System.currentTimeMillis()-t<millis){
+
+        }
+    }
+
+    public void initIMU(){
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+
+
+        robot.imu.initialize(parameters);
+
+        telemetry.addData("Mode", "calibrating...");
+        telemetry.update();
+
+        // make sure the imu gyro is calibrated before continuing.
+        while (!isStopRequested() && !robot.imu.isGyroCalibrated())
+        {
+            sleep(50);
+            idle();
+        }
+
+        telemetry.addData("Mode", "waiting for start");
+        telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
+        telemetry.update();
+
+        // wait for start button.
+}
 
     /**
      * Initialize the Vuforia localization engine.
@@ -180,37 +203,147 @@ public class IMUTesting90degreeTurnTensorFlow extends LinearOpMode {
     }
     double DRIVE_POWER = 1.0;
     public void TurnLeft(double lPower, double rPower){
-        leftWheel.setPower(lPower);
-        rightWheel.setPower(rPower);
+        robot.leftWheel.setPower(lPower);
+        robot.rightWheel.setPower(rPower);
 
     }
     public void TurnRight(double lPower, double rPower){
-        leftWheel.setPower(lPower);
-        rightWheel.setPower(rPower);
+        robot.leftWheel.setPower(lPower);
+        robot.rightWheel.setPower(rPower);
 
     }
 
     public void DriveForward(double power){
-        leftWheel.setPower(power);
-        rightWheel.setPower(power);
+        robot.leftWheel.setPower(power);
+        robot.rightWheel.setPower(power);
 
     }
     public void DriveBackward(double power){
-        leftWheel.setPower(-power);
-        rightWheel.setPower(-power);
+        robot.leftWheel.setPower(-power);
+        robot.rightWheel.setPower(-power);
 
     }
     public void ShiftLeft(double power){
-        centerWheel.setPower(power);
+        robot.centerWheel.setPower(power);
     }
     public void ShiftRight(double power){
-        centerWheel.setPower(-power);
+        robot.centerWheel.setPower(-power);
     }
     public void StopDriving(){
-        leftWheel.setPower(0);
-        rightWheel.setPower(0);
-        centerWheel.setPower(0);
+        robot.leftWheel.setPower(0);
+        robot.rightWheel.setPower(0);
+        robot.centerWheel.setPower(0);
 
     }
+    private void resetAngle()
+    {
+        lastAngles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
+        globalAngle = 0;
+    }
+
+    /**
+     * Get current cumulative angle rotation from last reset.
+     * @return Angle in degrees. + = left, - = right.
+     */
+    private double getAngle()
+    {
+        // We experimentally determined the Z axis is the axis we want to use for heading angle.
+        // We have to process the angle because the imu works in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
+
+        Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
+    }
+
+    /**
+     * See if we are moving in a straight line and if not return a power correction value.
+     * @return Power adjustment, + is adjust left - is adjust right.
+     */
+    private double checkDirection()
+    {
+        // The gain value determines how sensitive the correction is to direction changes.
+        // You will have to experiment with your robot to get small smooth direction changes
+        // to stay on a straight line.
+        double correction, angle, gain = .10;
+
+        angle = getAngle();
+
+        if (angle == 0)
+            correction = 0;             // no adjustment.
+        else
+            correction = -angle;        // reverse sign of angle for correction.
+
+        correction = correction * gain;
+
+        return correction;
+    }
+
+    /**
+     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
+     * @param degrees Degrees to turn, + is left - is right
+     */
+    private void rotate(int degrees, double power)
+    {
+        double  leftPower, rightPower;
+
+        // restart imu movement tracking.
+        resetAngle();
+
+        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+        // clockwise (right).
+
+        if (degrees < 0)
+        {   // turn right.
+            leftPower = -power;
+            rightPower = power;
+        }
+        else if (degrees > 0)
+        {   // turn left.
+            leftPower = power;
+            rightPower = -power;
+        }
+        else return;
+
+        // set power to rotate.
+        robot.leftWheel.setPower(leftPower);
+        robot.rightWheel.setPower(rightPower);
+
+        // rotate until turn is completed.
+        if (degrees < 0)
+        {
+            // On right turn we have to get off zero first.
+            while (opModeIsActive() && getAngle() == 0) {}
+
+            while (opModeIsActive() && getAngle() > degrees) {}
+        }
+        else    // left turn.
+            while (opModeIsActive() && getAngle() < degrees) {}
+
+        // turn the motors off.
+        robot.rightWheel.setPower(0);
+        robot.leftWheel.setPower(0);
+
+        // wait for rotation to stop.
+        sleep(1000);
+
+        // reset angle tracking on new heading.
+        resetAngle();
+    }
 }
+
+
+

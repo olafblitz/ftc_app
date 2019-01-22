@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Gyroscope;
@@ -22,7 +23,7 @@ public class NormalTeleOpAS extends LinearOpMode {
     private DcMotor linearActuator;
     private Servo markerDropper;
     private DcMotor linExt;
-
+    private CRServo intake;
 
     @Override
     public void runOpMode() {
@@ -33,6 +34,7 @@ public class NormalTeleOpAS extends LinearOpMode {
         double turn;
         double max;
         double trigger;
+        intake = hardwareMap.get(CRServo.class, "intake");
         imu = hardwareMap.get(Gyroscope.class, "imu");
         leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
         rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
@@ -80,7 +82,15 @@ public class NormalTeleOpAS extends LinearOpMode {
 
             leftWheel.setPower(left);
             rightWheel.setPower(right);
-
+            if(gamepad1.left_trigger > 0){
+                intake.setPower(1);
+            }
+            else if (gamepad1.right_trigger >0 ){
+                intake.setPower(-1);
+            }
+            else{
+                intake.setPower(0);
+            }
             if(gamepad1.y){
                 linearActuator.setPower(1);
             }
