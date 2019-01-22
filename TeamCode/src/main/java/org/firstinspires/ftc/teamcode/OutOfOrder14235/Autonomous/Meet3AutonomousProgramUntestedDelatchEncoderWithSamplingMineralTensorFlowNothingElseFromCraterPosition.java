@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -18,6 +20,7 @@ import java.util.List;
 
 public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTensorFlowNothingElseFromCraterPosition extends LinearOpMode{
     HardwareRobot robot;
+    private ElapsedTime runtime  = new ElapsedTime();
 
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -27,6 +30,14 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
     private TFObjectDetector tfod;
     Orientation             lastAngles = new Orientation();
 
+
+    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
     double globalAngle, power = .30, correction;
     public void runOpMode() {
         robot = new HardwareRobot();
@@ -46,11 +57,23 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
         waitForStart();
 
 //delatch, get off
-        
+        encoderDrive(DRIVE_SPEED,  16,   5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+
         rotate(90,.5);
 
 
-
+//delatch with encoder
+        //move backa  but
+        //move right
+        //move back more
+        //move back to center
+        //look for mineral
+        //hit mineral go to certain place
+        //turn 45 detree
+        //drive
+        //place marker
+        //turn
+        //go to crater
 
         if (opModeIsActive()) {
             /** Activate Tensor Flow Object Detection. */
@@ -93,6 +116,9 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
 
                                     ShiftRight(.4);
                                     sleep(600);
+                                    ShiftLeft(.4);
+                                    sleep(700);
+
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                     telemetry.addData("Gold Mineral Position", "Right");
                                     telemetry.update();
@@ -106,6 +132,11 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
 
                                     ShiftRight(.4);
                                     sleep(500);
+                                    ShiftLeft(.4);
+                                    sleep(700);
+                                    DriveBackward(.6);
+                                    sleep(500);
+
 
                                 } else {
 
@@ -342,6 +373,51 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
 
         // reset angle tracking on new heading.
         resetAngle();
+    }
+    public void encoderDrive(double speed,
+                             double inches,
+                             double timeoutS) {
+        int newTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newTarget = robot.linearActuator.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
+            robot.leftWheel.setTargetPosition(newTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.linearActuator.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.linearActuator.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d :%7d", newTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        robot.linearActuator.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.linearActuator.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
     }
 }
 
