@@ -86,7 +86,7 @@ public class HardwareRobot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        imu = hwMap.get(BNO055IMU.class, "imu");
+        imu = hwMap.get(BNO055IMU.class, "imuBase");
 
         leftWheel = hwMap.get(DcMotor.class, "left_drive");
         rightWheel = hwMap.get(DcMotor.class, "right_drive");
@@ -94,8 +94,8 @@ public class HardwareRobot
         markerDropper = hwMap.get(Servo.class, "markerDropper");
         linearActuator = hwMap.get(DcMotor.class, "wormGear");
         linExt = hwMap.get(DcMotor.class, "linExt");
-        linExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       // linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftWheel.setDirection(DcMotor.Direction.REVERSE);
         leftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -108,7 +108,7 @@ public class HardwareRobot
     }
 
     public void deLatch() {
-        linExt.setTargetPosition(16000);
+        linearActuator.setTargetPosition(16000);
     }
 
 

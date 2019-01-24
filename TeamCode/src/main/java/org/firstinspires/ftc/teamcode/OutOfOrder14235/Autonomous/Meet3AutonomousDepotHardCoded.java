@@ -1,24 +1,25 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
 import java.util.List;
 
-public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTensorFlowNothingElseFromCraterPosition extends LinearOpMode{
+@Autonomous
+public class Meet3AutonomousDepotHardCoded extends LinearOpMode{
     HardwareRobot robot;
     private ElapsedTime runtime  = new ElapsedTime();
 
@@ -31,13 +32,13 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
     Orientation             lastAngles = new Orientation();
 
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    /*static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
-    static final double     TURN_SPEED              = 0.5;
+            (WHEEL_DIAMETER_INCHES * 3.1415);*/
+   // static final double     DRIVE_SPEED             = 0.6;
+   // static final double     TURN_SPEED              = 0.5;
     double globalAngle, power = .30, correction;
     public void runOpMode() {
         robot = new HardwareRobot();
@@ -55,12 +56,23 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
         waitForStart();
-
+        robot.linearActuator.setPower(1);
+        sleep(3500);
+        StopDriving();
+        /*ShiftRight(.2);
+        sleep(500);
+        StopDriving();
+        DriveForward(.5);
+        sleep(2000);
+        StopDriving();
+        TurnLeft(.5,-.5);
+        sleep(2000);
+        StopDriving();
+        DriveForward(.5);
+        sleep(2000);
+        StopDriving();*/
 //delatch, get off
-        encoderDrive(DRIVE_SPEED,  16,   5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-
-        rotate(90,.5);
-
+       // encoderDrive(DRIVE_SPEED,  16,   5.0);  // S1: Forward 47 Inches with 5 Sec timeout
 
 //delatch with encoder
         //move backa  but
@@ -76,7 +88,7 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
         //go to crater
 
         if (opModeIsActive()) {
-            /** Activate Tensor Flow Object Detection. */
+            /* Activate Tensor Flow Object Detection. */
             if (tfod != null) {
                 tfod.activate();
             }
@@ -101,6 +113,7 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
                                     silverMineral2X = (int) recognition.getLeft();
                                 }
                             }
+
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
                                     telemetry.addData("Gold Mineral Position", "Left");
@@ -118,7 +131,7 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
                                     sleep(600);
                                     ShiftLeft(.4);
                                     sleep(700);
-
+                                    StopDriving();
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                     telemetry.addData("Gold Mineral Position", "Right");
                                     telemetry.update();
@@ -130,13 +143,15 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
                                     sleep(800);
                                     StopDriving();
 
-                                    ShiftRight(.4);
+                                    ShiftRight(-.4);
                                     sleep(500);
+                                    StopDriving();
                                     ShiftLeft(.4);
                                     sleep(700);
+                                    StopDriving();
                                     DriveBackward(.6);
                                     sleep(500);
-
+                                    StopDriving();
 
                                 } else {
 
@@ -147,14 +162,16 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
                                     StopDriving();
                                     ShiftRight(.4);
                                     sleep(800);
-
+                                    StopDriving();
                                 }
                             }
+
                         }
                         telemetry.update();
                     }
                 }
             }
+            //
         }
 
         if (tfod != null) {
@@ -237,6 +254,11 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
         robot.leftWheel.setPower(lPower);
         robot.rightWheel.setPower(rPower);
 
+    }
+    public void StopMoving (){
+        robot.leftWheel.setPower(0);
+        robot.rightWheel.setPower(0);
+        robot.centerWheel.setPower(0);
     }
     public void TurnRight(double lPower, double rPower){
         robot.leftWheel.setPower(lPower);
@@ -374,7 +396,7 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
         // reset angle tracking on new heading.
         resetAngle();
     }
-    public void encoderDrive(double speed,
+    /*public void encoderDrive(double speed,
                              double inches,
                              double timeoutS) {
         int newTarget;
@@ -418,7 +440,7 @@ public class Meet3AutonomousProgramUntestedDelatchEncoderWithSamplingMineralTens
 
             //  sleep(250);   // optional pause after each move
         }
-    }
+    }*/
 }
 
 

@@ -23,7 +23,8 @@ public class NormalTeleOpAS extends LinearOpMode {
     private DcMotor linearActuator;
     private Servo markerDropper;
     private DcMotor linExt;
-    private CRServo intake;
+    private CRServo intakeSpinner;
+    private CRServo intakeFlipper;
 
     @Override
     public void runOpMode() {
@@ -34,7 +35,9 @@ public class NormalTeleOpAS extends LinearOpMode {
         double turn;
         double max;
         double trigger;
-        intake = hardwareMap.get(CRServo.class, "intake");
+        intakeSpinner = hardwareMap.get(CRServo.class, "intake");
+        intakeFlipper = hardwareMap.get(CRServo.class, "intakeFlipper");
+
         imu = hardwareMap.get(Gyroscope.class, "imu");
         leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
         rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
@@ -82,14 +85,24 @@ public class NormalTeleOpAS extends LinearOpMode {
 
             leftWheel.setPower(left);
             rightWheel.setPower(right);
-            if(gamepad1.left_trigger > 0){
-                intake.setPower(1);
+            if(gamepad2.right_trigger>0){
+                intakeFlipper.setPower(.6);
             }
-            else if (gamepad1.right_trigger >0 ){
-                intake.setPower(-1);
+            else if(gamepad2.left_trigger>0){
+                intakeFlipper.setPower(-.6);
+
             }
             else{
-                intake.setPower(0);
+                intakeFlipper.setPower(0);
+            }
+            if(gamepad1.left_trigger > 0){
+                intakeSpinner.setPower(1);
+            }
+            else if (gamepad1.right_trigger >0 ){
+                intakeSpinner.setPower(-1);
+            }
+            else{
+                intakeSpinner.setPower(0);
             }
             if(gamepad1.y){
                 linearActuator.setPower(1);
@@ -117,10 +130,10 @@ public class NormalTeleOpAS extends LinearOpMode {
 
             }
             if(gamepad1.right_bumper){
-                linExt.setPower(.95);
+                linExt.setPower(1);
             }
             else if(gamepad1.left_bumper){
-                linExt.setPower(-.95);
+                linExt.setPower(-1);
             }
             else{
                 linExt.setPower(0);
