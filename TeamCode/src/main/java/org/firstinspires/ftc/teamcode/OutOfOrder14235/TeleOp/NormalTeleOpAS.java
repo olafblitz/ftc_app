@@ -55,6 +55,8 @@ public class NormalTeleOpAS extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            telemetry.addData("encoder position: ", linearActuator.getCurrentPosition());
+telemetry.update();
             // trigger = gamepad1.right_trigger;
             //drive = -gamepad1.left_stick_y;
             //  turn  =  gamepad1.right_stick_x;

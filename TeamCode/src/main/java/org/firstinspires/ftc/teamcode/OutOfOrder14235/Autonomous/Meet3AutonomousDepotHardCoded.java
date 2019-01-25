@@ -44,6 +44,8 @@ public class Meet3AutonomousDepotHardCoded extends LinearOpMode{
         robot = new HardwareRobot();
         robot.init(hardwareMap);
         initIMU();
+        robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         initVuforia();
         robot.markerDropper.setPosition(.3);
         if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
@@ -56,9 +58,16 @@ public class Meet3AutonomousDepotHardCoded extends LinearOpMode{
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
         waitForStart();
-        robot.linearActuator.setPower(1);
-        sleep(3500);
-        StopDriving();
+        robot.linearActuator.setTargetPosition(-11730);
+        robot.linearActuator.setPower(.6);
+        while (opModeIsActive() && robot.linearActuator.isBusy())
+        {
+            telemetry.addData("LINEAR ACTUATOR ENCODER", robot.linearActuator.getCurrentPosition() + "  busy=" + robot.linearActuator.isBusy());
+            telemetry.update();
+            idle();
+        }
+
+        robot.linearActuator.setPower(0.0);
         /*ShiftRight(.2);
         sleep(500);
         StopDriving();
@@ -396,51 +405,7 @@ public class Meet3AutonomousDepotHardCoded extends LinearOpMode{
         // reset angle tracking on new heading.
         resetAngle();
     }
-    /*public void encoderDrive(double speed,
-                             double inches,
-                             double timeoutS) {
-        int newTarget;
 
-        // Ensure that the opmode is still active
-        if (opModeIsActive()) {
-
-            // Determine new target position, and pass to motor controller
-            newTarget = robot.linearActuator.getCurrentPosition() + (int)(inches * COUNTS_PER_INCH);
-            robot.leftWheel.setTargetPosition(newTarget);
-
-            // Turn On RUN_TO_POSITION
-            robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            // reset the timeout time and start motion.
-            runtime.reset();
-            robot.linearActuator.setPower(Math.abs(speed));
-
-            // keep looping while we are still active, and there is time left, and both motors are running.
-            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-            // its target position, the motion will stop.  This is "safer" in the event that the robot will
-            // always end the motion as soon as possible.
-            // However, if you require that BOTH motors have finished their moves before the robot continues
-            // onto the next step, use (isBusy() || isBusy()) in the loop test.
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (robot.linearActuator.isBusy())) {
-
-                // Display it for the driver.
-                telemetry.addData("Path1",  "Running to %7d :%7d", newTarget);
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        robot.linearActuator.getCurrentPosition());
-                telemetry.update();
-            }
-
-            // Stop all motion;
-            robot.linearActuator.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            robot.linearActuator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            //  sleep(250);   // optional pause after each move
-        }
-    }*/
 }
 
 

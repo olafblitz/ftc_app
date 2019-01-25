@@ -43,6 +43,7 @@ public class Meet3AutonomousDepot extends LinearOpMode{
     public void runOpMode() {
         robot = new HardwareRobot();
         robot.init(hardwareMap);
+
         initIMU();
         initVuforia();
         robot.markerDropper.setPosition(.3);
