@@ -79,6 +79,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
         telemetry.update();
         waitForStart();
 
+
         telemetry.addData("1 imu heading", lastAngles.firstAngle);
         telemetry.addData("2 global heading", globalAngle);
         telemetry.addData("3 correction", correction);
@@ -93,7 +94,6 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
             telemetry.update();
             idle();
         }
-
 
         robot.linearActuator.setPower(0.0);
         sleep(400);
@@ -173,7 +173,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     StopDriving();
 
                                     DriveForward(1);
-                                    sleep(4300);
+                                    sleep(3200);
                                     StopDriving();
                                     robot.linExt.setPower(1);
                                     sleep(1000);
@@ -209,7 +209,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     sleep(740);
                                     StopDriving();
                                     DriveForward(1);
-                                    sleep(4300);
+                                    sleep(3480);
                                     StopDriving();
                                     robot.linExt.setPower(1);
                                     sleep(1000);
@@ -244,7 +244,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     sleep(300);
                                     StopDriving();
                                     DriveForward(1);
-                                    sleep(3900);
+                                    sleep(3300);
                                     StopDriving();
                                     robot.linExt.setPower(1);
                                     sleep(1000);
