@@ -16,7 +16,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+@Disabled
 @Autonomous
 //@Disabled
 public class IMUTesting90degreeTurnTensorFlow extends LinearOpMode {

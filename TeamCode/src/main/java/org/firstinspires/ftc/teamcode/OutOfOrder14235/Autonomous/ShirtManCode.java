@@ -82,7 +82,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 
 import java.lang.*;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+@Disabled
 @Autonomous
 
 public class ShirtManCode extends OpMode {

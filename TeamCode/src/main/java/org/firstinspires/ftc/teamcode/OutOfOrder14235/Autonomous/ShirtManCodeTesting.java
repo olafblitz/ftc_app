@@ -50,7 +50,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 //import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 //import com.qualcomm.robotcore.hardware.DcMotorSimple;
 //import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+@Disabled
 @Autonomous
 
 public class ShirtManCodeTesting extends OpMode {

@@ -88,29 +88,29 @@ telemetry.update();
             leftWheel.setPower(left);
             rightWheel.setPower(right);
             if(gamepad2.right_trigger>0){
-                intakeFlipper.setPower(.6);
+                intakeFlipper.setPower(.4);
             }
             else if(gamepad2.left_trigger>0){
-                intakeFlipper.setPower(-.6);
+                intakeFlipper.setPower(-.4);
 
             }
             else{
                 intakeFlipper.setPower(0);
             }
-            if(gamepad1.left_trigger > 0){
+            if(gamepad2.left_bumper){
                 intakeSpinner.setPower(1);
             }
-            else if (gamepad1.right_trigger >0 ){
+            else if (gamepad2.right_bumper ){
                 intakeSpinner.setPower(-1);
             }
             else{
                 intakeSpinner.setPower(0);
             }
             if(gamepad1.y){
-                linearActuator.setPower(1);
+                linearActuator.setPower(-1);
             }
             else if(gamepad1.a){
-                linearActuator.setPower(-1);
+                linearActuator.setPower(1);
             }
             else{
                 linearActuator.setPower(0);
@@ -131,11 +131,11 @@ telemetry.update();
                 markerDropper.setPosition(0.75);
 
             }
-            if(gamepad1.right_bumper){
-                linExt.setPower(1);
-            }
-            else if(gamepad1.left_bumper){
+            if(gamepad2.y){
                 linExt.setPower(-1);
+            }
+            else if(gamepad2.a){
+                linExt.setPower(1);
             }
             else{
                 linExt.setPower(0);

@@ -26,7 +26,8 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+@Disabled
 
 @Autonomous
 

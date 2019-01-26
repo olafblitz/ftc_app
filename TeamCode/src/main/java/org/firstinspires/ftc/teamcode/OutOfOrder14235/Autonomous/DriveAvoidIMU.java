@@ -1,46 +1,50 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
+// Simple autonomous program that drives bot forward until end of period
+// or touch sensor is hit. If touched, backs up a bit and turns 90 degrees
+// right and keeps going. Demonstrates obstacle avoidance and use of the
+// REV Hub's built in IMU in place of a gyro. Also uses gamepad1 buttons to
+// simulate touch sensor press and supports left as well as right turn.
+//
+// Also uses IMU to drive in a straight line when not avoiding an obstacle.
+
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-@Disabled
-public class IMUTesting90degreeTurn extends LinearOpMode{
-    private DcMotor leftWheel;
-    private DcMotor rightWheel;
-    private DcMotor centerWheel;
-    private DcMotor linearActuator;
-    private Servo markerDropper;
-    private DcMotor linExt;
 
+@Autonomous
+//@Disabled
+public class DriveAvoidIMU extends LinearOpMode
+{
+    DcMotor                 leftWheel;
+    DcMotor rightWheel;
+    DigitalChannel          touch;
     BNO055IMU               imu;
     Orientation             lastAngles = new Orientation();
     double globalAngle, power = .30, correction;
+    boolean                 aButton, bButton, touched;
 
     // called when init button is  pressed.
     @Override
     public void runOpMode() throws InterruptedException
     {
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
-        rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
-        centerWheel = hardwareMap.get(DcMotor.class, "pulleyMotor");
-        markerDropper = hardwareMap.get(Servo.class, "markerDropper");
-        linearActuator = hardwareMap.get(DcMotor.class, "wormGear");
-        linExt = hardwareMap.get(DcMotor.class, "linExt");
+        leftWheel = hardwareMap.dcMotor.get("left_drive");
 
-        leftWheel.setDirection(DcMotor.Direction.REVERSE);
+        rightWheel = hardwareMap.dcMotor.get("right_drive");
+        rightWheel.setDirection(DcMotor.Direction.REVERSE);
 
         leftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // get a reference to REV Touch sensor.
+        //touch = hardwareMap.digitalChannel.get("touch_sensor");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -98,10 +102,28 @@ public class IMUTesting90degreeTurn extends LinearOpMode{
             // one place with time passing between those places. See the lesson on
             // Timing Considerations to know why.
 
-          rotate(270,.5);
-          rotate(-270,.5);
-          rotate(270,.5);
+            aButton = gamepad1.a;
+            bButton = gamepad1.b;
+            touched = touch.getState();
 
+            if (!touched || aButton || bButton)
+            {
+                // backup.
+                leftWheel.setPower(power);
+                rightWheel.setPower(power);
+
+                sleep(500);
+
+                // stop.
+                leftWheel.setPower(0);
+                rightWheel.setPower(0);
+
+                // turn 90 degrees right.
+                if (!touched || aButton) rotate(-90, power);
+
+                // turn 90 degrees left.
+                if (bButton) rotate(90, power);
+            }
         }
 
         // turn the motors off.

@@ -99,7 +99,6 @@ public class HardwareRobot
         leftWheel.setDirection(DcMotor.Direction.REVERSE);
         leftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
