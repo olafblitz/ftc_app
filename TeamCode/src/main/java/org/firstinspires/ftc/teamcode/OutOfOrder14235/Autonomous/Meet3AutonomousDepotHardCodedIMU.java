@@ -84,7 +84,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
         telemetry.addData("3 correction", correction);
         telemetry.update();
 
-        robot.linearActuator.setTargetPosition(-11700);
+        robot.linearActuator.setTargetPosition(-11600);
         robot.linearActuator.setPower(.8);
 
         while (opModeIsActive() && robot.linearActuator.isBusy())
@@ -104,10 +104,10 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
             sleep(650);
             StopDriving();
         ShiftRight(.5);
-            sleep(1200);
+            sleep(960);
             StopDriving();
         DriveBackward(.4);
-            sleep(750);
+            sleep(780);
             StopDriving();
 
 
@@ -148,18 +148,41 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     sleep(1000);
                                     StopDriving();
                                     DriveForward(.8);
-                                    sleep(1180);
+                                    sleep(800);
                                     StopDriving();
 
                                     ShiftRight(.8);
-                                    sleep(1200);
+                                    sleep(2750);
                                     StopDriving();
-                                    ShiftLeft(.8);
-                                    sleep(1650);
+
+                                    robot.leftWheel.setPower(.5);
+                                    robot.rightWheel.setPower(-.5);
+                                    sleep(600);
                                     StopDriving();
-                                    DriveBackward(-.8);
+
+                                    ShiftRight(.5);
+                                    sleep(600);
+                                    StopDriving();
+
+                                    robot.markerDropper.setPosition(.8);
+                                    sleep(100);
+
+                                    robot.leftWheel.setPower(-.5);
+                                    robot.rightWheel.setPower(.5);
+                                    sleep(2000);
+                                    StopDriving();
+
+                                    DriveForward(1);
+                                    sleep(4300);
+                                    StopDriving();
+                                    robot.linExt.setPower(1);
                                     sleep(1000);
-                                    StopDriving();
+                                    robot.linExt.setPower(0);
+                                    robot.intakeFlipper.setPower(1);
+                                    sleep(400);
+                                    robot.intakeFlipper.setPower(0);
+
+
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                                     telemetry.addData("Gold Mineral Position", "Right");
                                     telemetry.update();
@@ -168,33 +191,73 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     sleep(1000);
                                     StopDriving();
                                     DriveForward(-.8);
-                                    sleep(1200);
+                                    sleep(930);
                                     StopDriving();
                                     ShiftRight(.8);
+                                    sleep(3000);
+                                    StopDriving();
+                                    robot.leftWheel.setPower(-.5);
+                                    robot.rightWheel.setPower(.5);
+                                    sleep(1200);
+                                    StopDriving();
+                                    ShiftRight(1);
                                     sleep(1300);
                                     StopDriving();
+                                    robot.markerDropper.setPosition(1);
+                                    robot.leftWheel.setPower(.3);
+                                    robot.rightWheel.setPower(-.3);
+                                    sleep(740);
+                                    StopDriving();
+                                    DriveForward(1);
+                                    sleep(4300);
+                                    StopDriving();
+                                    robot.linExt.setPower(1);
+                                    sleep(1000);
+                                    robot.linExt.setPower(0);
+                                    robot.intakeFlipper.setPower(1);
+                                    sleep(400);
+                                    robot.intakeFlipper.setPower(0);
+
+                                    /*
                                     ShiftLeft(.8);
                                     sleep(1350);
                                     StopDriving();
                                     robot.leftWheel.setPower(.2);
                                     robot.rightWheel.setPower(-.2);
-                                    sleep(650);
+                                    sleep(720);
                                     StopDriving();
                                     DriveBackward(-.8);
                                     sleep(3000);
                                     StopDriving();
+                                    */
 
                                 } else {
 
                                     telemetry.addData("Gold Mineral Position", "Center");
                                     telemetry.update();
-                                    ShiftRight(.8);
-                                    sleep(2000);
+                                    ShiftRight(.9);
+                                    sleep(4250);
                                     StopDriving();
+                                    robot.markerDropper.setPosition(1);
+                                    robot.leftWheel.setPower(.3);
+                                    robot.rightWheel.setPower(-.3);
+                                    sleep(300);
+                                    StopDriving();
+                                    DriveForward(1);
+                                    sleep(3900);
+                                    StopDriving();
+                                    robot.linExt.setPower(1);
+                                    sleep(1000);
+                                    robot.linExt.setPower(0);
+                                    robot.intakeFlipper.setPower(1);
+                                    sleep(400);
+                                    robot.intakeFlipper.setPower(0);
+                                    /*
                                     ShiftRight(-.7);
                                     sleep(1900);
                                     StopDriving();
                                     break;
+                                    */
                                 }
                             }
 
@@ -211,9 +274,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
         }
         //gyro turn
 ////////
-        robot.linearActuator.setTargetPosition(6400);
-        robot.linearActuator.setPower(.9);
-        robot.linearActuator.setPower(0);
+
     }
 
     public void waiting(long millis){

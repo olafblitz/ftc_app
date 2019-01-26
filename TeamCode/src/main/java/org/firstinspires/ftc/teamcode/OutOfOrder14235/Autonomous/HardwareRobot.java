@@ -33,6 +33,8 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -68,6 +70,8 @@ public class HardwareRobot
     public DcMotor centerWheel;
     public DcMotor linearActuator;
     public Servo markerDropper;
+    public CRServo intake;
+    public CRServo intakeFlipper;
     public DcMotor linExt;
 
     /* local OpMode members. */
@@ -92,6 +96,9 @@ public class HardwareRobot
         rightWheel = hwMap.get(DcMotor.class, "right_drive");
         centerWheel = hwMap.get(DcMotor.class, "pulleyMotor");
         markerDropper = hwMap.get(Servo.class, "markerDropper");
+        intake = hwMap.get(CRServo.class, "intake");
+        intakeFlipper = hwMap.get(CRServo.class, "intakeFlipper");
+
         linearActuator = hwMap.get(DcMotor.class, "wormGear");
         linExt = hwMap.get(DcMotor.class, "linExt");
         //linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
