@@ -25,6 +25,7 @@ public class NormalTeleOpAS extends LinearOpMode {
     private DcMotor linExt;
     private CRServo intakeSpinner;
     private CRServo intakeFlipper;
+    private DcMotor flipper;
 
     @Override
     public void runOpMode() {
@@ -35,8 +36,6 @@ public class NormalTeleOpAS extends LinearOpMode {
         double turn;
         double max;
         double trigger;
-        intakeSpinner = hardwareMap.get(CRServo.class, "intake");
-        intakeFlipper = hardwareMap.get(CRServo.class, "intakeFlipper");
 
         imu = hardwareMap.get(Gyroscope.class, "imu");
         leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
@@ -45,6 +44,8 @@ public class NormalTeleOpAS extends LinearOpMode {
         markerDropper = hardwareMap.get(Servo.class, "markerDropper");
         linearActuator = hardwareMap.get(DcMotor.class, "wormGear");
         linExt = hardwareMap.get(DcMotor.class, "linExt");
+        flipper = hardwareMap.get(DcMotor.class, "flipper");
+
 
         leftWheel.setDirection(DcMotor.Direction.REVERSE);
 
@@ -88,14 +89,14 @@ telemetry.update();
             leftWheel.setPower(left);
             rightWheel.setPower(right);
             if(gamepad2.right_trigger>0){
-                intakeFlipper.setPower(.4);
+                flipper.setPower(.4);
             }
             else if(gamepad2.left_trigger>0){
-                intakeFlipper.setPower(-.4);
+                flipper.setPower(-.4);
 
             }
             else{
-                intakeFlipper.setPower(0);
+                flipper.setPower(0);
             }
             if(gamepad2.left_bumper){
                 intakeSpinner.setPower(1);

@@ -29,8 +29,15 @@
 
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
+import android.app.Activity;
+import android.view.View;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -70,8 +77,17 @@ public class HardwareRobot
     public DcMotor centerWheel;
     public DcMotor linearActuator;
     public Servo markerDropper;
-    public CRServo intake;
-    public CRServo intakeFlipper;
+    ColorSensor colorSideLeft;
+    DistanceSensor distanceSideLeft;
+    ColorSensor colorSideRight;
+    DistanceSensor distanceSideRight;
+    DigitalChannel  touchLeft;
+    DigitalChannel  touchRight;
+    DistanceSensor sensorSideRange;
+    ColorSensor colorMarker;
+    DistanceSensor distanceMarker;
+
+public DcMotor flipper;
     public DcMotor linExt;
 
     /* local OpMode members. */
@@ -96,20 +112,32 @@ public class HardwareRobot
         rightWheel = hwMap.get(DcMotor.class, "right_drive");
         centerWheel = hwMap.get(DcMotor.class, "pulleyMotor");
         markerDropper = hwMap.get(Servo.class, "markerDropper");
-        intake = hwMap.get(CRServo.class, "intake");
-        intakeFlipper = hwMap.get(CRServo.class, "intakeFlipper");
 
         linearActuator = hwMap.get(DcMotor.class, "wormGear");
         linExt = hwMap.get(DcMotor.class, "linExt");
-        //linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       // linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        colorSideLeft = hwMap.get(ColorSensor.class, "colorDistanceLeft");
+        colorSideRight = hwMap.get(ColorSensor.class, "colorDistanceRight");
+
+        distanceSideLeft = hwMap.get(DistanceSensor.class, "colorDistanceLeft");
+        distanceSideRight = hwMap.get(DistanceSensor.class, "colorDistanceRight");
+        touchLeft = hwMap.get(DigitalChannel.class, "touchSensorLeft");
+        touchLeft.setMode(DigitalChannel.Mode.INPUT);
+        touchRight = hwMap.get(DigitalChannel.class, "touchSensorRight");
+        touchRight.setMode(DigitalChannel.Mode.INPUT);
+        colorMarker = hwMap.get(ColorSensor.class, "colorMarker");
+        distanceMarker = hwMap.get(DistanceSensor.class, "colorMarker");
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorSideRange;
+
+
+        float hsvValues[] = {0F, 0F, 0F};
+        final float values[] = hsvValues;
+        final double SCALE_FACTOR = 255;
+        int relativeLayoutId = hwMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hwMap.appContext.getPackageName());
+        final View relativeLayout = ((Activity) hwMap.appContext).findViewById(relativeLayoutId);
+
         leftWheel.setDirection(DcMotor.Direction.REVERSE);
         leftWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // Set all motors to run without encoders.
-        // May want to use RUN_USING_ENCODERS if encoders are installed.
-
 
     }
 

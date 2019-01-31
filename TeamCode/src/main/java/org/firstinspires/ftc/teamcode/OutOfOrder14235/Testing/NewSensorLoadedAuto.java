@@ -98,7 +98,7 @@ public class NewSensorLoadedAuto extends LinearOpMode{
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
 
-        
+
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
@@ -204,9 +204,7 @@ public class NewSensorLoadedAuto extends LinearOpMode{
                                     robot.linExt.setPower(-1);
                                     sleep(2000);
                                     robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
+
 
 
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
@@ -240,9 +238,6 @@ public class NewSensorLoadedAuto extends LinearOpMode{
                                     robot.linExt.setPower(-1);
                                     sleep(2000);
                                     robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
 
                                     /*
                                     ShiftLeft(.8);
@@ -275,9 +270,7 @@ public class NewSensorLoadedAuto extends LinearOpMode{
                                     robot.linExt.setPower(-1);
                                     sleep(2000);
                                     robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
+
                                     /*
                                     ShiftRight(-.7);
                                     sleep(1900);
