@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.view.View;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -21,11 +22,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 @Autonomous
-public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
+public class AutonomousColorSensorAlign extends LinearOpMode{
     HardwareRobot robot;
     private ElapsedTime runtime  = new ElapsedTime();
     ColorSensor colorLeft;
@@ -106,11 +105,26 @@ public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
             sleep(650);
             StopDriving();
         ShiftRight(.5);
-            sleep(960);
+            sleep(500);//use to be 960
             StopDriving();
-        DriveBackward(.5);
-            sleep(950);
-            StopDriving();
+        while(colorLeft.red() < 230 && colorRight.red() <230){
+            if(colorLeft.red()<150 && colorRight.red() <150){
+                ShiftRight(.3);
+                sleep(300);//use to be 960
+                StopDriving();
+            }
+            else if (colorLeft.red()>150 && colorRight.red() <150){
+                robot.leftWheel.setPower(.3);
+                sleep(300);//use to be 960
+                StopDriving();
+            }
+            else if (colorLeft.red()< 150 && colorRight.red() >150){
+                robot.rightWheel.setPower(.3);
+                sleep(300);//use to be 960
+                StopDriving();
+            }
+        }
+
 
 
 

@@ -28,7 +28,7 @@ public class IMUTesting90degreeTurn extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException
     {
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imuBase");
         leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
         rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
         centerWheel = hardwareMap.get(DcMotor.class, "pulleyMotor");
@@ -86,7 +86,7 @@ public class IMUTesting90degreeTurn extends LinearOpMode{
             // Use gyro to drive in a straight line.
             correction = checkDirection();
 
-            telemetry.addData("1 imu heading", lastAngles.firstAngle);
+            telemetry.addData("1 imu heading", lastAngles.thirdAngle);
             telemetry.addData("2 global heading", globalAngle);
             telemetry.addData("3 correction", correction);
             telemetry.update();
@@ -132,7 +132,7 @@ public class IMUTesting90degreeTurn extends LinearOpMode{
 
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+        double deltaAngle = angles.thirdAngle - lastAngles.thirdAngle;
 
         if (deltaAngle < -180)
             deltaAngle += 360;

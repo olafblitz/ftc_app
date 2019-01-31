@@ -1,13 +1,15 @@
-package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
+package org.firstinspires.ftc.teamcode.OutOfOrder14235.Testing;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.view.View;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -19,19 +21,36 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous.HardwareRobot;
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.View;
 
-import java.util.List;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous.HardwareRobot;
+
+import java.util.Locale;
+import java.util.List;
 
 @Autonomous
-public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
+public class NewSensorLoadedAuto extends LinearOpMode{
     HardwareRobot robot;
     private ElapsedTime runtime  = new ElapsedTime();
-    ColorSensor colorLeft;
-    DistanceSensor distanceLeft;
-    ColorSensor colorRight;
-    DistanceSensor distanceRight;
+    ColorSensor colorSideLeft;
+    DistanceSensor distanceSideLeft;
+    ColorSensor colorSideRight;
+    DistanceSensor distanceSideRight;
+    DigitalChannel  touchLeft;
+    DigitalChannel  touchRight;
+    DistanceSensor sensorSideRange;
+
 
 
 
@@ -47,11 +66,18 @@ public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
     public void runOpMode() {
         robot = new HardwareRobot();
         robot.init(hardwareMap);
-        colorLeft = hardwareMap.get(ColorSensor.class, "colorDistanceLeft");
-        colorRight = hardwareMap.get(ColorSensor.class, "colorDistanceRight");
+        colorSideLeft = hardwareMap.get(ColorSensor.class, "colorDistanceLeft");
+        colorSideRight = hardwareMap.get(ColorSensor.class, "colorDistanceRight");
 
-        distanceLeft = hardwareMap.get(DistanceSensor.class, "colorDistanceLeft");
-        distanceRight = hardwareMap.get(DistanceSensor.class, "colorDistanceRight");
+        distanceSideLeft = hardwareMap.get(DistanceSensor.class, "colorDistanceLeft");
+        distanceSideRight = hardwareMap.get(DistanceSensor.class, "colorDistanceRight");
+        touchLeft = hardwareMap.get(DigitalChannel.class, "touchSensorLeft");
+        touchLeft.setMode(DigitalChannel.Mode.INPUT);
+        touchRight = hardwareMap.get(DigitalChannel.class, "touchSensorRight");
+        touchRight.setMode(DigitalChannel.Mode.INPUT);
+        sensorSideRange = hardwareMap.get(DistanceSensor.class, "sensorSideRange");
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorSideRange;
+
 
         float hsvValues[] = {0F, 0F, 0F};
         final float values[] = hsvValues;
@@ -72,10 +98,7 @@ public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
 
-
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-        // and named "imu".
+        
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
@@ -99,7 +122,7 @@ public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
 
         robot.linearActuator.setPower(0.0);
         sleep(400);
-        ShiftRight(.5);
+        /*ShiftRight(.5);
         sleep(300);
         StopDriving();
         DriveForward(.5);
@@ -111,10 +134,11 @@ public class Meet3AutonomousDepotCompleteGoodUse extends LinearOpMode{
         DriveBackward(.5);
             sleep(950);
             StopDriving();
-
+*/
 
 
         if (opModeIsActive()) {
+
             /* Activate Tensor Flow Object Detection. */
             if (tfod != null) {
                 tfod.activate();
