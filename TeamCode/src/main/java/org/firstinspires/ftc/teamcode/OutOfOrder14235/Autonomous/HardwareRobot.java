@@ -72,6 +72,8 @@ public class HardwareRobot
 {
     /* Public OpMode members. */
     BNO055IMU imu;
+    BNO055IMU otherImu;
+
     public DcMotor leftWheel;
     public DcMotor rightWheel;
     public DcMotor centerWheel;
@@ -83,9 +85,11 @@ public class HardwareRobot
     DistanceSensor distanceSideRight;
     DigitalChannel  touchLeft;
     DigitalChannel  touchRight;
-    DistanceSensor sensorSideRange;
+    DistanceSensor distanceBottom;
     ColorSensor colorMarker;
     DistanceSensor distanceMarker;
+
+    public DcMotor sideArm;
 
 public DcMotor flipper;
     public DcMotor linExt;
@@ -107,7 +111,9 @@ public DcMotor flipper;
 
         // Define and Initialize Motors
         imu = hwMap.get(BNO055IMU.class, "imuBase");
+        otherImu = hwMap.get(BNO055IMU.class, "imu");
 
+        sideArm = hwMap.get(DcMotor.class, "sideArm");
         leftWheel = hwMap.get(DcMotor.class, "left_drive");
         rightWheel = hwMap.get(DcMotor.class, "right_drive");
         centerWheel = hwMap.get(DcMotor.class, "pulleyMotor");
@@ -126,7 +132,8 @@ public DcMotor flipper;
         touchRight.setMode(DigitalChannel.Mode.INPUT);
         colorMarker = hwMap.get(ColorSensor.class, "colorMarker");
         distanceMarker = hwMap.get(DistanceSensor.class, "colorMarker");
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorSideRange;
+        distanceBottom = hwMap.get(DistanceSensor.class, "distanceBottom");
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceBottom;
 
 
         float hsvValues[] = {0F, 0F, 0F};

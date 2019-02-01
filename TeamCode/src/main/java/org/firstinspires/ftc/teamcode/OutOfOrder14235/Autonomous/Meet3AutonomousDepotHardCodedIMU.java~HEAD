@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,19 +17,11 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 @Autonomous
 public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
     HardwareRobot robot;
     private ElapsedTime runtime  = new ElapsedTime();
-    ColorSensor colorLeft;
-    DistanceSensor distanceLeft;
-    ColorSensor colorRight;
-    DistanceSensor distanceRight;
-
-
 
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -47,17 +35,6 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
     public void runOpMode() {
         robot = new HardwareRobot();
         robot.init(hardwareMap);
-        colorLeft = hardwareMap.get(ColorSensor.class, "colorDistanceLeft");
-        colorRight = hardwareMap.get(ColorSensor.class, "colorDistanceRight");
-
-        distanceLeft = hardwareMap.get(DistanceSensor.class, "colorDistanceLeft");
-        distanceRight = hardwareMap.get(DistanceSensor.class, "colorDistanceRight");
-
-        float hsvValues[] = {0F, 0F, 0F};
-        final float values[] = hsvValues;
-        final double SCALE_FACTOR = 255;
-        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
-        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
 
         robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -297,7 +274,6 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
         }
         //gyro turn
 ////////
-        // Set the panel back to the default col
 
     }
 

@@ -1,14 +1,9 @@
 package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
-import android.app.Activity;
-import android.view.View;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -24,15 +19,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 @Autonomous
-public class AutonomousColorSensorAlign extends LinearOpMode{
+public class Meet3AutonomousDepotHardCodedIMUSampleOnLander extends LinearOpMode{
     HardwareRobot robot;
     private ElapsedTime runtime  = new ElapsedTime();
-    ColorSensor colorLeft;
-    DistanceSensor distanceLeft;
-    ColorSensor colorRight;
-    DistanceSensor distanceRight;
-
-
 
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -40,24 +29,18 @@ public class AutonomousColorSensorAlign extends LinearOpMode{
     private static final String VUFORIA_KEY = "AXykNg//////AAABmdVQDVwq9kAEsspJU9r8u8VmSeZBFzHTHr6fsWSjYKVlHaAw6uE0fxEJ0zCNaIbGmpOSWf0NY/pFNh4N5uYYtL99ymMWhR2tfuIBXgo7T4m8ht7lStZtjHjmcmO0nQBzzGCm74gw+CDYvRbfDYtr95fNuoMIcyZUiv2TpUcsbebE+fT6HEfyGXyF1j4d6CEzWc1Qhdy+nCCC3kO/5oDt8usf3ryOzBgFW/l4l+YEqk1LVw1vrx4+DhiqQ87ohJDybGab6FvqxC2Hlryx0p7BdmwCtQqfaRD8s8icv7XUR09Xlij02Z5iRe/7+aJc44fxmu3xTB17y3r8Er0YmqVvU3EChH5p0+SiHl+z36p78c1J";
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
+
     BNO055IMU               imu;
     Orientation             lastAngles = new Orientation();
     double globalAngle, power = .30, correction;
+    enum MineralPosition
+    {
+        LEFT, CENTER, RIGHT;
+    }
+    MineralPosition position;
     public void runOpMode() {
         robot = new HardwareRobot();
         robot.init(hardwareMap);
-        colorLeft = hardwareMap.get(ColorSensor.class, "colorDistanceLeft");
-        colorRight = hardwareMap.get(ColorSensor.class, "colorDistanceRight");
-
-        distanceLeft = hardwareMap.get(DistanceSensor.class, "colorDistanceLeft");
-        distanceRight = hardwareMap.get(DistanceSensor.class, "colorDistanceRight");
-
-        float hsvValues[] = {0F, 0F, 0F};
-        final float values[] = hsvValues;
-        final double SCALE_FACTOR = 255;
-        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
-        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-
         robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -70,63 +53,42 @@ public class AutonomousColorSensorAlign extends LinearOpMode{
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
+        imu.initialize(parameters);
 
+        telemetry.addData("Mode", "calibrating...");
+        telemetry.update();
 
+        // make sure the imu gyro is calibrated before continuing.
+        while (!isStopRequested() && !imu.isGyroCalibrated())
+        {
+            sleep(50);
+            idle();
+        }
+
+        telemetry.addData("Mode", "waiting for start DO NOT START UNTIL READY TO GO MSG");
+        telemetry.addData("imu calib status", imu.getCalibrationStatus().toString());
+        telemetry.update();
         telemetry.addLine("AUTONOMOUS READY TO GO");
         telemetry.update();
         waitForStart();
 
 
-
-
-        robot.linearActuator.setTargetPosition(-11750);
-        robot.linearActuator.setPower(.8);
-
-        while (opModeIsActive() && robot.linearActuator.isBusy())
-        {
-            telemetry.addData("LINEAR ACTUATOR ENCODER", robot.linearActuator.getCurrentPosition() + "  busy=" + robot.linearActuator.isBusy());
-            telemetry.update();
-            idle();
-        }
-
-        robot.linearActuator.setPower(0.0);
-        sleep(400);
-        ShiftRight(.5);
-        sleep(300);
-        StopDriving();
-        DriveForward(.5);
-            sleep(650);
-            StopDriving();
-        ShiftRight(.5);
-            sleep(500);//use to be 960
-            StopDriving();
-        while(colorLeft.red() < 230 && colorRight.red() <230){
-            if(colorLeft.red()<150 && colorRight.red() <150){
-                ShiftRight(.3);
-                sleep(300);//use to be 960
-                StopDriving();
-            }
-            else if (colorLeft.red()>150 && colorRight.red() <150){
-                robot.leftWheel.setPower(.3);
-                sleep(300);//use to be 960
-                StopDriving();
-            }
-            else if (colorLeft.red()< 150 && colorRight.red() >150){
-                robot.rightWheel.setPower(.3);
-                sleep(300);//use to be 960
-                StopDriving();
-            }
-        }
-
-
-
+        telemetry.addData("1 imu heading", lastAngles.firstAngle);
+        telemetry.addData("2 global heading", globalAngle);
+        telemetry.addData("3 correction", correction);
+        telemetry.update();
 
         if (opModeIsActive()) {
             /* Activate Tensor Flow Object Detection. */
@@ -157,176 +119,164 @@ public class AutonomousColorSensorAlign extends LinearOpMode{
 
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                                     position = MineralPosition.LEFT;
                                     telemetry.addData("Gold Mineral Position", "Left");
                                     telemetry.update();
-
-                                    ShiftRight(.8);
-                                    sleep(1000);
-                                    StopDriving();
-                                    DriveForward(.8);
-                                    sleep(800);
-                                    StopDriving();
-
-                                    ShiftRight(.8);
-                                    sleep(2750);
-                                    StopDriving();
-
-                                    robot.leftWheel.setPower(.5);
-                                    robot.rightWheel.setPower(-.5);
-                                    sleep(600);
-                                    StopDriving();
-
-                                    ShiftRight(.5);
-                                    sleep(600);
-                                    StopDriving();
-
-                                    robot.markerDropper.setPosition(.8);
-                                    sleep(100);
-
-                                    robot.leftWheel.setPower(-.5);
-                                    robot.rightWheel.setPower(.5);
-                                    sleep(2000);
-                                    StopDriving();
-
-                                    DriveForward(1);
-                                    sleep(3200);
-                                    StopDriving();
-                                    robot.linExt.setPower(-1);
-                                    sleep(2000);
-                                    robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
+break;
 
 
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                                     position = MineralPosition.RIGHT;
+
                                     telemetry.addData("Gold Mineral Position", "Right");
                                     telemetry.update();
+                                    break;
 
-                                    ShiftRight(.8);
-                                    sleep(1000);
-                                    StopDriving();
-                                    DriveForward(-.8);
-                                    sleep(930);
-                                    StopDriving();
-                                    ShiftRight(.8);
-                                    sleep(3000);
-                                    StopDriving();
-                                    robot.leftWheel.setPower(-.5);
-                                    robot.rightWheel.setPower(.5);
-                                    sleep(1200);
-                                    StopDriving();
-                                    ShiftRight(1);
-                                    sleep(1300);
-                                    StopDriving();
-                                    robot.markerDropper.setPosition(1);
-                                    robot.leftWheel.setPower(.3);
-                                    robot.rightWheel.setPower(-.3);
-                                    sleep(740);
-                                    StopDriving();
-                                    DriveForward(1);
-                                    sleep(3480);
-                                    StopDriving();
-                                    robot.linExt.setPower(-1);
-                                    sleep(2000);
-                                    robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
 
-                                    /*
-                                    ShiftLeft(.8);
-                                    sleep(1350);
-                                    StopDriving();
-                                    robot.leftWheel.setPower(.2);
-                                    robot.rightWheel.setPower(-.2);
-                                    sleep(720);
-                                    StopDriving();
-                                    DriveBackward(-.8);
-                                    sleep(3000);
-                                    StopDriving();
-                                    */
-
-                                } else {
+                                } else  if (goldMineralX > silverMineral1X && goldMineralX < silverMineral2X || goldMineralX < silverMineral1X && goldMineralX > silverMineral2X ) {
+                                     position = MineralPosition.CENTER;
 
                                     telemetry.addData("Gold Mineral Position", "Center");
                                     telemetry.update();
-                                    ShiftRight(.9);
-                                    sleep(4250);
-                                    StopDriving();
-                                    robot.markerDropper.setPosition(1);
-                                    robot.leftWheel.setPower(.3);
-                                    robot.rightWheel.setPower(-.3);
-                                    sleep(300);
-                                    StopDriving();
-                                    DriveForward(1);
-                                    sleep(3300);
-                                    StopDriving();
-                                    robot.linExt.setPower(-1);
-                                    sleep(2000);
-                                    robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
-                                    /*
-                                    ShiftRight(-.7);
-                                    sleep(1900);
-                                    StopDriving();
                                     break;
-                                    */
+
+                                }
+                                else{
+                                    MineralPosition position = MineralPosition.LEFT;
+                                    telemetry.addData("Gold Mineral Position", "NOT DETECTED: GUESSING LEFT");
+                                    telemetry.update();
+                                    break;
+
                                 }
                             }
-                            /*else{
-                                telemetry.addData("Gold Mineral Position", "GUESSING ");
-                                telemetry.update();
-
-                                ShiftRight(.8);
-                                sleep(1000);
-                                StopDriving();
-                                DriveForward(-.8);
-                                sleep(930);
-                                StopDriving();
-                                ShiftRight(.8);
-                                sleep(3000);
-                                StopDriving();
-                                robot.leftWheel.setPower(-.5);
-                                robot.rightWheel.setPower(.5);
-                                sleep(1200);
-                                StopDriving();
-                                ShiftRight(1);
-                                sleep(1300);
-                                StopDriving();
-                                robot.markerDropper.setPosition(1);
-                                robot.leftWheel.setPower(.3);
-                                robot.rightWheel.setPower(-.3);
-                                sleep(740);
-                                StopDriving();
-                                DriveForward(1);
-                                sleep(3480);
-                                StopDriving();
-                                robot.linExt.setPower(-1);
-                                sleep(2000);
-                                robot.linExt.setPower(0);
-                                robot.intakeFlipper.setPower(1);
-                                sleep(400);
-                                robot.intakeFlipper.setPower(0);
-
-                            }*/
 
                         }
                         telemetry.update();
                     }
                 }
             }
-            //
         }
 
         if (tfod != null) {
             tfod.shutdown();
         }
-        //gyro turn
-////////
-        // Set the panel back to the default col
+
+        robot.linearActuator.setTargetPosition(-11600);
+        robot.linearActuator.setPower(.8);
+
+        while (opModeIsActive() && robot.linearActuator.isBusy())
+        {
+            telemetry.addData("LINEAR ACTUATOR ENCODER", robot.linearActuator.getCurrentPosition() + "  busy=" + robot.linearActuator.isBusy());
+            telemetry.update();
+            idle();
+        }
+
+        robot.linearActuator.setPower(0.0);
+        sleep(400);
+        telemetry.addData("Delatched!", 1);
+        telemetry.update();
+        ShiftRight(.5);
+        sleep(300);
+        StopDriving();
+        DriveForward(.5);
+            sleep(650);
+            StopDriving();
+        ShiftRight(.5);
+            sleep(960);
+            StopDriving();
+        DriveBackward(.4);
+            sleep(780);
+            StopDriving();
+        telemetry.addData("Checkpoint Reached!!", 1);
+        telemetry.update();
+
+        if(position == MineralPosition.LEFT ){
+
+            ShiftRight(.8);
+            sleep(1000);
+            StopDriving();
+            DriveForward(.8);
+            sleep(800);
+            StopDriving();
+
+            ShiftRight(.8);
+            sleep(2750);
+            StopDriving();
+
+            robot.leftWheel.setPower(.5);
+            robot.rightWheel.setPower(-.5);
+            sleep(600);
+            StopDriving();
+
+            ShiftRight(.5);
+            sleep(600);
+            StopDriving();
+
+            robot.markerDropper.setPosition(.8);
+            sleep(100);
+
+            robot.leftWheel.setPower(-.5);
+            robot.rightWheel.setPower(.5);
+            sleep(2000);
+            StopDriving();
+
+            DriveForward(1);
+            sleep(3200);
+            StopDriving();
+            robot.linExt.setPower(1);
+            sleep(1000);
+            robot.linExt.setPower(0);
+
+        }
+        else if(position == MineralPosition.RIGHT){
+
+            ShiftRight(.8);
+            sleep(1000);
+            StopDriving();
+            DriveForward(-.8);
+            sleep(930);
+            StopDriving();
+            ShiftRight(.8);
+            sleep(3000);
+            StopDriving();
+            robot.leftWheel.setPower(-.5);
+            robot.rightWheel.setPower(.5);
+            sleep(1200);
+            StopDriving();
+            ShiftRight(1);
+            sleep(1300);
+            StopDriving();
+            robot.markerDropper.setPosition(1);
+            robot.leftWheel.setPower(.3);
+            robot.rightWheel.setPower(-.3);
+            sleep(740);
+            StopDriving();
+            DriveForward(1);
+            sleep(3480);
+            StopDriving();
+            robot.linExt.setPower(1);
+            sleep(1000);
+            robot.linExt.setPower(0);
+
+        }
+        else if(position == MineralPosition.CENTER){
+            ShiftRight(.9);
+            sleep(4250);
+            StopDriving();
+            robot.markerDropper.setPosition(1);
+            robot.leftWheel.setPower(.3);
+            robot.rightWheel.setPower(-.3);
+            sleep(300);
+            StopDriving();
+            DriveForward(1);
+            sleep(3300);
+            StopDriving();
+            robot.linExt.setPower(1);
+            sleep(1000);
+            robot.linExt.setPower(0);
+
+        }
+
 
     }
 

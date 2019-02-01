@@ -35,7 +35,6 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
     public void runOpMode() {
         robot = new HardwareRobot();
         robot.init(hardwareMap);
-
         robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -178,9 +177,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     robot.linExt.setPower(1);
                                     sleep(1000);
                                     robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
+
 
 
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
@@ -214,9 +211,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     robot.linExt.setPower(1);
                                     sleep(1000);
                                     robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
+
 
                                     /*
                                     ShiftLeft(.8);
@@ -249,9 +244,7 @@ public class Meet3AutonomousDepotHardCodedIMU extends LinearOpMode{
                                     robot.linExt.setPower(1);
                                     sleep(1000);
                                     robot.linExt.setPower(0);
-                                    robot.intakeFlipper.setPower(1);
-                                    sleep(400);
-                                    robot.intakeFlipper.setPower(0);
+
                                     /*
                                     ShiftRight(-.7);
                                     sleep(1900);
