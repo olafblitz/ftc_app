@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
@@ -43,6 +44,8 @@ public class Meet3AutonomousDepotHardCodedIMUSampleOnLander extends LinearOpMode
         robot.init(hardwareMap);
         robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.linExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         initVuforia();
         robot.markerDropper.setPosition(.3);
@@ -122,7 +125,7 @@ public class Meet3AutonomousDepotHardCodedIMUSampleOnLander extends LinearOpMode
                                      position = MineralPosition.LEFT;
                                     telemetry.addData("Gold Mineral Position", "Left");
                                     telemetry.update();
-break;
+                                    break;
 
 
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
@@ -171,6 +174,13 @@ break;
             idle();
         }
 
+        robot.linearActuator.setPower(0.0);
+        sleep(600);
+        while(robot.distanceBottom.getDistance(DistanceUnit.CM) >= 8.5 ){
+
+                robot.linearActuator.setPower(.3);
+
+        }
         robot.linearActuator.setPower(0.0);
         sleep(400);
         telemetry.addData("Delatched!", 1);
