@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Autonomous
-public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMode{
+public class LeagueChampsAutonomousDepotSampleOnLanderMRGYRO extends LinearOpMode{
     HardwareRobot robot;
     ModernRoboticsI2cGyro gyro;                    // Additional Gyro device
 
@@ -68,6 +68,8 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
         robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.linExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.linExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.sideArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.sideArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         gyro =  hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
 
         // Ensure the robot it stationary, then reset the encoders and calibrate the gyro.
@@ -97,16 +99,7 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
             initTfod();
         } else telemetry.addData("Sorry!", "This device is not compatible with TFOD");
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled       = true;
-        parameters.useExternalCrystal   = true;
-        parameters.mode                 = BNO055IMU.SensorMode.IMU;
-        parameters.loggingTag           = "IMU";
-        imu                             = hardwareMap.get(BNO055IMU.class, "imu");
 
-        imu.initialize(parameters);
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start tracking");
         telemetry.update();
@@ -118,6 +111,8 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
 
         telemetry.addData("Mode", "waiting for start DO NOT START UNTIL READY TO GO MSG");
         telemetry.update();
+        robot.sideArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.sideArm.setTargetPosition(0);
         telemetry.addLine("AUTONOMOUS READY TO GO");
         telemetry.update();
         waitForStart();
@@ -151,14 +146,14 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
 
                             if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                                 if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-                                    position = LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.LEFT;
+                                    position = LeagueChampsAutonomousDepotSampleOnLanderMRGYRO.MineralPosition.LEFT;
                                     telemetry.addData("Gold Mineral Position", "Left");
                                     telemetry.update();
                                     break;
 
 
                                 } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-                                    position = LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.RIGHT;
+                                    position = LeagueChampsAutonomousDepotSampleOnLanderMRGYRO.MineralPosition.RIGHT;
 
                                     telemetry.addData("Gold Mineral Position", "Right");
                                     telemetry.update();
@@ -166,7 +161,7 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
 
 
                                 } else  if (goldMineralX > silverMineral1X && goldMineralX < silverMineral2X || goldMineralX < silverMineral1X && goldMineralX > silverMineral2X ) {
-                                    position = LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.CENTER;
+                                    position = LeagueChampsAutonomousDepotSampleOnLanderMRGYRO.MineralPosition.CENTER;
 
                                     telemetry.addData("Gold Mineral Position", "Center");
                                     telemetry.update();
@@ -193,7 +188,7 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
             tfod.shutdown();
         }
 
-        robot.linearActuator.setTargetPosition(-11630);
+        robot.linearActuator.setTargetPosition(-11620);
         robot.linearActuator.setPower(.9);
 
         while (opModeIsActive() && robot.linearActuator.isBusy())
@@ -204,20 +199,21 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
         }
 
         robot.linearActuator.setPower(0.0);
-        sleep(300);
+        sleep(100);
         while(robot.distanceBottom.getDistance(DistanceUnit.CM) >= 8.7 ){
 
             robot.linearActuator.setPower(.3);
 
         }
         robot.linearActuator.setPower(0.0);
-        sleep(300);
+        sleep(100);
         telemetry.addData("Delatched!", 1);
         telemetry.update();
-
+        ShiftRight(.8);
+        sleep(220);
         StopDriving();
-        DriveForward(.83);
-        sleep(1200);
+        DriveForward(.8);
+        sleep(1240);
         StopDriving();
         ShiftRight(.8);
         sleep(720);
@@ -225,36 +221,49 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
         DriveBackward(.8);
         sleep(1160);
         StopDriving();
-        gyroTurn(.4,0);
+        gyroTurn(.6,0);
         StopDriving();
         telemetry.addData("Checkpoint Reached!!", 1);
         telemetry.update();
 
-        if(position == LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.LEFT ){
+        if(position == LeagueChampsAutonomousDepotSampleOnLanderMRGYRO.MineralPosition.LEFT ){
 
             ShiftRight(.7);
-            sleep(1000);
+            sleep(900);//changed from 950l battery power vwry i,poprtmnat
             StopDriving();
             DriveForward(1);
             sleep(1400);
             StopDriving();
 
             ShiftRight(.9);
-            sleep(1000);
+            sleep(2000);
             StopDriving();
-            ShiftRight(-.9);
-            sleep(1300);
+//needs work
+            gyroTurn(.8,-35);
             StopDriving();
 
-            gyroTurn(.5,0);
-                DriveForward(1);
-                sleep(5000);
+            ShiftRight(1);
+            sleep(1450);
+            StopDriving();
 
+            robot.markerDropper.setPosition(1);
+            sleep(100);
+            ShiftLeft(.8);
+            sleep(375);
+            StopDriving();
 
-            StopDriving();//needs work
+            gyroTurn(.8,15);
+            sleep(300);
+            StopDriving();
+            robot.markerDropper.setPosition(.3);
+            StopDriving();
+
+            DriveForward(1);
+            sleep(4000);
+            StopDriving();
 
         }
-        else if(position == LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.RIGHT){
+        else if(position == LeagueChampsAutonomousDepotSampleOnLanderMRGYRO.MineralPosition.RIGHT){
 
             ShiftRight(.5);
             sleep(1750);
@@ -263,35 +272,44 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
             sleep(1500);
             StopDriving();
             ShiftRight(1);
-            sleep(1000);
+            sleep(1800);
             StopDriving();
-            ShiftRight(-.9);
-            sleep(1300);
+            gyroTurn(.5,32);
+            StopDriving();
+            ShiftRight(1);
+            sleep(1250);
+            StopDriving();
+            robot.markerDropper.setPosition(1);
+            ShiftLeft(.5);
+            sleep(200);
             StopDriving();
 
-            gyroTurn(.5,0);
             DriveForward(1);
-            sleep(5000);
-
-
-            StopDriving();//
+            sleep(2000);
+            StopDriving();
+            robot.markerDropper.setPosition(.3);
+            DriveForward(1);
+            sleep(3000);
+            StopDriving();
 
 
         }
-        else if(position == LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.CENTER){
+        else if(position == LeagueChampsAutonomousDepotSampleOnLanderMRGYRO.MineralPosition.CENTER){
             ShiftRight(1);
-            sleep(1200);
+            sleep(3200);
             StopDriving();
-            ShiftRight(-.9);
-            sleep(1300);
+            robot.markerDropper.setPosition(1);
+            //robot.leftWheel.setPower(-.3);
+            //robot.rightWheel.setPower(.3);
+            gyroTurn(.5,30);
             StopDriving();
+            robot.markerDropper.setPosition(.3);
 
-            gyroTurn(.5,0);
             DriveForward(1);
             sleep(5000);
+            StopDriving();
 
 
-            StopDriving();//
         }
 
 

@@ -1,40 +1,31 @@
-package org.firstinspires.ftc.teamcode.OutOfOrder14235.TeleOp;
-
-import android.graphics.Color;
+package org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Gyroscope;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous.HardwareRobot;
 
+import java.util.List;
 import java.util.Locale;
 
-@TeleOp
-
-public class NormalTeleOpAS extends LinearOpMode {
+@Autonomous
+public class MRGYROTesting extends LinearOpMode{
     HardwareRobot robot;
     ModernRoboticsI2cGyro gyro;                    // Additional Gyro device
+
 
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
@@ -51,217 +42,117 @@ public class NormalTeleOpAS extends LinearOpMode {
     static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
     static final double     P_DRIVE_COEFF           = 0.15;     // Larger is more responsive, but also less stable
 
-    private Gyroscope imu;
-    private DcMotor leftWheel;
-    private DcMotor rightWheel;
-    private DcMotor centerWheel;
-    private DcMotor linearActuator;
-    private Servo markerDropper;
-    private DcMotor linExt;
-    DistanceSensor distanceBottom;
-    ColorSensor colorSideLeft;
-    DistanceSensor distanceSideLeft;
-    ColorSensor colorSideRight;
-    DistanceSensor distanceSideRight;
-    DigitalChannel touchLeft;
-    DigitalChannel  touchRight;
-    ColorSensor colorMarker;
-    DistanceSensor distanceMarker;
+    enum MineralPosition
+    {
+        LEFT, CENTER, RIGHT;
+    }
+    private ElapsedTime runtime  = new ElapsedTime();
 
-    private DcMotor flipper;
+    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    private static final String VUFORIA_KEY = "AXykNg//////AAABmdVQDVwq9kAEsspJU9r8u8VmSeZBFzHTHr6fsWSjYKVlHaAw6uE0fxEJ0zCNaIbGmpOSWf0NY/pFNh4N5uYYtL99ymMWhR2tfuIBXgo7T4m8ht7lStZtjHjmcmO0nQBzzGCm74gw+CDYvRbfDYtr95fNuoMIcyZUiv2TpUcsbebE+fT6HEfyGXyF1j4d6CEzWc1Qhdy+nCCC3kO/5oDt8usf3ryOzBgFW/l4l+YEqk1LVw1vrx4+DhiqQ87ohJDybGab6FvqxC2Hlryx0p7BdmwCtQqfaRD8s8icv7XUR09Xlij02Z5iRe/7+aJc44fxmu3xTB17y3r8Er0YmqVvU3EChH5p0+SiHl+z36p78c1J";
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+    BNO055IMU               imu;
+    private Orientation angles;
+    private Acceleration gravity;
 
-    @Override
+    MineralPosition position;
     public void runOpMode() {
         robot = new HardwareRobot();
         robot.init(hardwareMap);
-        double left;
-        double right;
-        double drive;
-        double turn;
-        double max;
-        double trigger;
+        imu = hardwareMap.get(BNO055IMU.class, "imuBase");
 
-        imu = hardwareMap.get(Gyroscope.class, "imu");
-        leftWheel = hardwareMap.get(DcMotor.class, "left_drive");
-        rightWheel = hardwareMap.get(DcMotor.class, "right_drive");
-        centerWheel = hardwareMap.get(DcMotor.class, "pulleyMotor");
-        markerDropper = hardwareMap.get(Servo.class, "markerDropper");
-        linearActuator = hardwareMap.get(DcMotor.class, "wormGear");
-        linExt = hardwareMap.get(DcMotor.class, "linExt");
-        flipper = hardwareMap.get(DcMotor.class, "flipper");
-        distanceBottom = hardwareMap.get(DistanceSensor.class, "distanceBottom");
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)distanceBottom;
-        colorSideLeft = hardwareMap.get(ColorSensor.class, "colorDistanceLeft");
-        colorSideRight = hardwareMap.get(ColorSensor.class, "colorDistanceRight");
-
-        distanceSideLeft = hardwareMap.get(DistanceSensor.class, "colorDistanceLeft");
-        distanceSideRight = hardwareMap.get(DistanceSensor.class, "colorDistanceRight");
-        touchLeft = hardwareMap.get(DigitalChannel.class, "touchSensorLeft");
-        touchLeft.setMode(DigitalChannel.Mode.INPUT);
-        touchRight = hardwareMap.get(DigitalChannel.class, "touchSensorRight");
-        touchRight.setMode(DigitalChannel.Mode.INPUT);
-        colorMarker = hardwareMap.get(ColorSensor.class, "colorMarker");
-        distanceMarker = hardwareMap.get(DistanceSensor.class, "colorMarker");
+        robot.linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linearActuator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.linExt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.linExt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         gyro =  hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
 
-        leftWheel.setDirection(DcMotor.Direction.REVERSE);
-        float hsvValuesLeft[] = {0F, 0F, 0F};
-
-        // values is a reference to the hsvValues array.
-        final float valuesLeft[] = hsvValuesLeft;
-
-        // sometimes it helps to multiply the raw RGB values with a scale factor
-        // to amplify/attentuate the measured values.
-        final double SCALE_FACTORLEFT = 255;
-        float hsvValuesRight[] = {0F, 0F, 0F};
-
-        // values is a reference to the hsvValues array.
-        final float valuesRight[] = hsvValuesRight;
-
-        // sometimes it helps to multiply the raw RGB values with a scale factor
-        // to amplify/attentuate the measured values.
-        final double SCALE_FACTORRIGHT = 255;
-
-
-        telemetry.addData("Status", "Ready to start!");
+        // Ensure the robot it stationary, then reset the encoders and calibrate the gyro.
+        robot.leftWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // Send telemetry message to alert driver that we are calibrating;
+        telemetry.addData(">", "Calibrating Gyro");    //
         telemetry.update();
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            Color.RGBToHSV((int) (colorSideLeft.red() * SCALE_FACTORLEFT),
-                    (int) (colorSideLeft.green() * SCALE_FACTORLEFT),
-                    (int) (colorSideLeft.blue() * SCALE_FACTORLEFT),
-                    hsvValuesLeft);
+        gyro.calibrate();
 
-            // send the info back to driver station using telemetry function.
-
-            telemetry.addData("LEFT Red  ", colorSideLeft.red());
-            telemetry.addData("LEFT Blue ", colorSideLeft.blue());
-
-            Color.RGBToHSV((int) (colorSideRight.red() * SCALE_FACTORRIGHT),
-                    (int) (colorSideRight.green() * SCALE_FACTORRIGHT),
-                    (int) (colorSideRight.blue() * SCALE_FACTORRIGHT),
-                    hsvValuesRight);
-
-            // send the info back to driver station using telemetry function.
-
-            telemetry.addData("RIGHT Red  ", colorSideRight.red());
-            telemetry.addData("RIGHT Blue ", colorSideRight.blue());
-
-
-            telemetry.addData("range", String.format("%.01f centimeters bottom distance sensor", distanceBottom.getDistance(DistanceUnit.CM)));
-            telemetry.addData("linear actuator encoder position: ", linearActuator.getCurrentPosition());
-            telemetry.update();
-            // trigger = gamepad1.right_trigger;
-            //drive = -gamepad1.left_stick_y;
-            //  turn  =  gamepad1.right_stick_x;
-
-            // Combine drive and turn for blended motion.
-            //left  = drive + turn;
-            //right = drive - turn;
-
-            // Normalize the values so neither exceed +/- 1.0
-            //  max = Math.max(Math.abs(left), Math.abs(right));
-            //if (max > 1.0)
-            //{
-            //    left /= max;
-            //    right /= max;
-            // }
-
-            drive = -gamepad1.left_stick_y;
-            turn  =  gamepad1.right_stick_x;
-
-            left  = drive + turn;
-            right = drive - turn;
-            max = Math.max(Math.abs(left), Math.abs(right));
-            if (max > 1.0)
-            {
-                left /= max;
-                right /= max;
-            }
-
-            leftWheel.setPower(left);
-            rightWheel.setPower(right);
-            if(gamepad2.right_trigger>0){
-                flipper.setPower(.4);
-            }
-            else if(gamepad2.left_trigger>0){
-                flipper.setPower(-.4);
-
-            }
-            else{
-                flipper.setPower(0);
-            }
-
-            if(gamepad1.y){
-                linearActuator.setPower(-1);
-            }
-            else if(gamepad1.a){
-                linearActuator.setPower(1);
-            }
-            else{
-                linearActuator.setPower(0);
-            }
-            if(gamepad1.x){
-                centerWheel.setPower(.7);
-            }
-            else if(gamepad1.b){
-                centerWheel.setPower(-.7);
-            }
-            else{
-                centerWheel.setPower(0);
-            }
-            if (gamepad1.dpad_left){
-                markerDropper.setPosition(.3);
-            }
-            else if (gamepad1.dpad_right){
-                markerDropper.setPosition(0.75);
-
-            }
-            if(gamepad2.y){
-                linExt.setPower(-1);
-            }
-            else if(gamepad2.a){
-                linExt.setPower(1);
-            }
-            else{
-                linExt.setPower(0);
-            }
-            if(gamepad1.dpad_down){
-                robot.sideArm.setPower(-1);
-            }
-            else if(gamepad1.dpad_up){
-                robot.sideArm.setPower(1);
-            }
-            else{
-                robot.sideArm.setPower(0);
-            }
-            if(gamepad2.x){
-                //TODO
-                gyro.calibrate();
-// make sure the gyro is calibrated before continuing
-                while (!isStopRequested() && gyro.isCalibrating())  {
-                    sleep(50);
-                    idle();
-                }
-                gyro.resetZAxisIntegrator();
-                telemetry.addData("GYRO", "FINISHED CALIBRATING");
-
-                telemetry.update();
-            }
-            if(gamepad2.b){
-                gyroTurn(.5,0);
-                StopDriving();
-
-            }
-
-
+        // make sure the gyro is calibrated before continuing
+        while (!isStopRequested() && gyro.isCalibrating())  {
+            sleep(50);
+            idle();
         }
-        telemetry.addData("Status", "Running");
 
+        telemetry.addData(">", "Gyro Done.");
         telemetry.update();
+
+        robot.leftWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        initVuforia();
+        robot.markerDropper.setPosition(.3);
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled       = true;
+        parameters.useExternalCrystal   = true;
+        parameters.mode                 = BNO055IMU.SensorMode.IMU;
+        parameters.loggingTag           = "IMU";
+        imu                             = hardwareMap.get(BNO055IMU.class, "imu");
+
+        imu.initialize(parameters);
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start tracking");
+        telemetry.update();
+
+
+
+
+
+
+        telemetry.addData("Mode", "waiting for start DO NOT START UNTIL READY TO GO MSG");
+        telemetry.update();
+        telemetry.addLine("AUTONOMOUS READY TO GO");
+        telemetry.update();
+        waitForStart();
+        gyro.resetZAxisIntegrator();
+        gyroTurn(.5, 0);
+        sleep(500);
+        gyroTurn(.5, -10);
+        sleep(500);
+
+        gyroTurn(.5, -20);
+        sleep(500);
+
+        gyroTurn(.5, -30);
+        sleep(500);
+
+        gyroTurn(.5, -40);
+        sleep(500);
+
+        gyroTurn(.5, -50);
+        sleep(500);
+
+        gyroTurn(.5, -60);
+        sleep(500);
+
+        gyroTurn(.5, 10);
+        sleep(500);
+
+        gyroTurn(.5, 20);
+        sleep(500);
+
+
+        gyroTurn(.5, 30);
+        sleep(500);
+        ;
+
 
     }
 
@@ -272,6 +163,35 @@ public class NormalTeleOpAS extends LinearOpMode {
         }
     }
 
+
+    /**
+     * Initialize the Vuforia localization engine.
+     */
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
+    }
+
+    /**
+     * Initialize the Tensor Flow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
+    }
     double DRIVE_POWER = 1.0;
     public void TurnLeft(double lPower, double rPower){
         robot.leftWheel.setPower(lPower);
@@ -311,7 +231,16 @@ public class NormalTeleOpAS extends LinearOpMode {
         robot.centerWheel.setPower(0);
 
     }
-
+    void sendTelemetry()
+    {
+        telemetry.addData("Status", imu.getSystemStatus().toString());
+        telemetry.addData("Calib", imu.getCalibrationStatus().toString());
+        telemetry.addData("Heading", formatAngle(angles.angleUnit, angles.firstAngle));
+        telemetry.addData("Roll", formatAngle(angles.angleUnit, angles.secondAngle));
+        telemetry.addData("Pitch", formatAngle(angles.angleUnit, angles.thirdAngle));
+        telemetry.addData("Grav", gravity.toString());
+        telemetry.update();
+    }
 
     String formatAngle(AngleUnit angleUnit, double angle)
     {
@@ -533,6 +462,7 @@ public class NormalTeleOpAS extends LinearOpMode {
     }
 
 
-
 }
+
+
 

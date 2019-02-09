@@ -69,6 +69,8 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  *  ftc_app\doc\tutorial\FTC_FieldCoordinateSystemDefinition.pdf
 
  */
+@Disabled
+
 
 @Autonomous(name="Pushbot: Auto Drive By Gyro", group="Pushbot")
 public class PushbotAutoDriveByGyro_LinearTest extends LinearOpMode {

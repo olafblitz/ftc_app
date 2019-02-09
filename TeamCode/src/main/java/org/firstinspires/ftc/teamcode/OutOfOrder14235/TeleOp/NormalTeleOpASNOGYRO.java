@@ -2,37 +2,28 @@ package org.firstinspires.ftc.teamcode.OutOfOrder14235.TeleOp;
 
 import android.graphics.Color;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.OutOfOrder14235.Autonomous.HardwareRobot;
 
 import java.util.Locale;
 
 @TeleOp
 
-public class NormalTeleOpAS extends LinearOpMode {
+public class NormalTeleOpASNOGYRO extends LinearOpMode {
     HardwareRobot robot;
     ModernRoboticsI2cGyro gyro;                    // Additional Gyro device
 
@@ -121,8 +112,6 @@ public class NormalTeleOpAS extends LinearOpMode {
         // sometimes it helps to multiply the raw RGB values with a scale factor
         // to amplify/attentuate the measured values.
         final double SCALE_FACTORRIGHT = 255;
-
-
         telemetry.addData("Status", "Ready to start!");
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)
@@ -238,23 +227,8 @@ public class NormalTeleOpAS extends LinearOpMode {
             else{
                 robot.sideArm.setPower(0);
             }
-            if(gamepad2.x){
-                //TODO
-                gyro.calibrate();
-// make sure the gyro is calibrated before continuing
-                while (!isStopRequested() && gyro.isCalibrating())  {
-                    sleep(50);
-                    idle();
-                }
-                gyro.resetZAxisIntegrator();
-                telemetry.addData("GYRO", "FINISHED CALIBRATING");
-
-                telemetry.update();
-            }
             if(gamepad2.b){
-                gyroTurn(.5,0);
-                StopDriving();
-
+                //TODO
             }
 
 
