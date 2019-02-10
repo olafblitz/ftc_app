@@ -193,7 +193,7 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
             tfod.shutdown();
         }
 
-        robot.linearActuator.setTargetPosition(-11630);
+        robot.linearActuator.setTargetPosition(-11700);
         robot.linearActuator.setPower(.9);
 
         while (opModeIsActive() && robot.linearActuator.isBusy())
@@ -214,16 +214,17 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
         sleep(300);
         telemetry.addData("Delatched!", 1);
         telemetry.update();
-
+ShiftLeft(.3);
+sleep(400);
         StopDriving();
         DriveForward(.83);
         sleep(1200);
         StopDriving();
         ShiftRight(.8);
-        sleep(720);
+        sleep(660);
         StopDriving();
         DriveBackward(.8);
-        sleep(1160);
+        sleep(1000);
         StopDriving();
         gyroTurn(.4,0);
         StopDriving();
@@ -232,32 +233,38 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
 
         if(position == LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.LEFT ){
 
-            ShiftRight(.7);
-            sleep(1000);
+            ShiftRight(1);
+            sleep(500);
             StopDriving();
             DriveForward(1);
             sleep(1400);
             StopDriving();
 
-            ShiftRight(.9);
+            ShiftRight(1);
             sleep(1000);
             StopDriving();
             ShiftRight(-.9);
-            sleep(1300);
+            sleep(1150);
             StopDriving();
-
-            gyroTurn(.5,0);
+            gyroTurn(1,11);
                 DriveForward(1);
-                sleep(5000);
-
-
-            StopDriving();//needs work
+                sleep(5750);
+            StopDriving();//needs work//
+             ShiftLeft(1);
+            sleep(850);
+            StopDriving();
+            robot.markerDropper.setPosition(1);
+          /*  sleep(100);
+            gyroTurn(1,-70);
+            DriveForward(1);
+            sleep(4000);
+            StopDriving();*/
 
         }
         else if(position == LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.RIGHT){
 
-            ShiftRight(.5);
-            sleep(1750);
+            ShiftRight(1);
+            sleep(500);
             StopDriving();
             DriveForward(-1);
             sleep(1500);
@@ -266,16 +273,24 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
             sleep(1000);
             StopDriving();
             ShiftRight(-.9);
-            sleep(1300);
+            sleep(1150);
             StopDriving();
-
-            gyroTurn(.5,0);
+            gyroTurn(1,-5);
+            StopDriving();
             DriveForward(1);
-            sleep(5000);
-
-
+            sleep(6800);
             StopDriving();//
-
+            ShiftLeft(.7);
+            sleep(400);
+            StopDriving();
+             robot.markerDropper.setPosition(1);
+             /*sleep(100);
+           gyroDrive(1,60,35);
+            robot.linExt.setPower(1);
+            sleep(1000);
+            robot.flipper.setPower(1);
+            sleep(500);
+            StopDriving();*/
 
         }
         else if(position == LeagueChampsAutonomousCraterSampleOnLanderMRGYRO.MineralPosition.CENTER){
@@ -283,15 +298,21 @@ public class LeagueChampsAutonomousCraterSampleOnLanderMRGYRO extends LinearOpMo
             sleep(1200);
             StopDriving();
             ShiftRight(-.9);
-            sleep(1300);
+            sleep(900);
             StopDriving();
-
-            gyroTurn(.5,0);
             DriveForward(1);
-            sleep(5000);
-
-
+            sleep(6000);
             StopDriving();//
+            ShiftLeft(1);
+            sleep(500);
+            StopDriving();
+            gyroTurn(1,5);
+            robot.markerDropper.setPosition(1);
+            /*sleep(100);
+            gyroTurn(.5,-70);
+            DriveForward(1);
+            sleep(4000);
+            StopDriving();*/
         }
 
 
